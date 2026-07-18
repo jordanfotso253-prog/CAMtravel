@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAM travel — Réservation confirmée</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="search-topbar">
+    <button class="search-toggle" aria-label="Menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <a href="dashboard.html" class="brand">
+      <svg class="brand-mark" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="27" fill="#fff"/><path d="M4 28 A24 24 0 0 1 52 28 L52 30 A24 24 0 0 0 4 30 Z" fill="#0b5c3d"/><circle cx="20" cy="20" r="9" fill="#f5921b"/><path d="M10 40 L22 22 L30 34 L36 26 L46 40 Z" fill="#0b5c3d"/><path d="M6 44 Q28 34 50 44 L50 50 Q28 42 6 50 Z" fill="#0b5c3d"/></svg>
+      <div class="brand-text"><h1><span class="cam">CAM</span> <span class="travel">travel</span></h1></div>
+    </a>
+    <div class="search-dropdown">
+      <a href="index.html">Accueil</a>
+      <a href="dashboard.html">Tableau de bord</a>
+      <a href="recherche.html">Rechercher un trajet</a>
+    </div>
+  </div>
+
+  <div class="confirm-wrap">
+    <div class="confirm-check">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+    </div>
+    <h2>Réservation confirmée !</h2>
+    <p>Votre réservation a été effectuée avec succès.</p>
+
+    <div class="confirm-card">
+      <div class="confirm-row"><span class="k">Référence</span><span class="v" id="cRef">YA001250608</span></div>
+      <div class="confirm-row"><span class="k">Trajet</span><span class="v" id="cTrajet">Yaoundé → Douala</span></div>
+      <div class="confirm-row"><span class="k">Date</span><span class="v" id="cDate">08 Juin 2024 - 08:00 AM</span></div>
+      <div class="confirm-row"><span class="k">Passagers</span><span class="v" id="cPassagers">1 Passager</span></div>
+      <div class="confirm-row"><span class="k">Montant payé</span><span class="v" id="cMontant">12 500 FCFA</span></div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <a href="#" class="btn-primary" id="downloadTicketBtn" style="text-decoration:none; display:block;">Télécharger le ticket</a>
+      <a href="index.html" class="btn-secondary">Retour à l'accueil</a>
+    </div>
+  </div>
+
+<script src="js/nav-toggle.js"></script>
+<script src="js/script-confirmation.js"></script>
+<script src="js/chatbot.js"></script>
+</body>
+</html>

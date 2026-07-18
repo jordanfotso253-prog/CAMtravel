@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAM travel — Vérifier un ticket</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="search-topbar">
+    <a href="admin-dashboard.html" class="brand">
+      <svg class="brand-mark" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="27" fill="#fff"/><path d="M4 28 A24 24 0 0 1 52 28 L52 30 A24 24 0 0 0 4 30 Z" fill="#0b5c3d"/><circle cx="20" cy="20" r="9" fill="#f5921b"/><path d="M10 40 L22 22 L30 34 L36 26 L46 40 Z" fill="#0b5c3d"/><path d="M6 44 Q28 34 50 44 L50 50 Q28 42 6 50 Z" fill="#0b5c3d"/></svg>
+      <div class="brand-text"><h1><span class="cam">CAM</span> <span class="travel">travel</span></h1></div>
+    </a>
+  </div>
+
+  <div class="verify-wrap">
+    <h2>Vérifier un ticket</h2>
+    <p class="hint">Entrez la référence indiquée sur le ticket du passager (ex: YA482913)</p>
+
+    <form id="verifyForm">
+      <div class="verify-input-row">
+        <input type="text" id="refInput" placeholder="Référence du ticket" maxlength="12">
+        <button type="submit" class="btn-primary" style="width:auto; padding:14px 24px;">Vérifier</button>
+      </div>
+    </form>
+
+    <div class="verify-result" id="resultBox"></div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/data-store.js"></script>
+<script src="js/script-verify-ticket.js"></script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAM travel — Rechercher un trajet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="search-topbar">
+    <button class="search-toggle" aria-label="Menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <a href="dashboard.html" class="brand">
+      <svg class="brand-mark" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="27" fill="#fff"/><path d="M4 28 A24 24 0 0 1 52 28 L52 30 A24 24 0 0 0 4 30 Z" fill="#0b5c3d"/><circle cx="20" cy="20" r="9" fill="#f5921b"/><path d="M10 40 L22 22 L30 34 L36 26 L46 40 Z" fill="#0b5c3d"/><path d="M6 44 Q28 34 50 44 L50 50 Q28 42 6 50 Z" fill="#0b5c3d"/></svg>
+      <div class="brand-text"><h1><span class="cam">CAM</span> <span class="travel">travel</span></h1></div>
+    </a>
+    <div class="search-dropdown">
+      <a href="index.html">Accueil</a>
+      <a href="dashboard.html">Tableau de bord</a>
+      <a href="recherche.html">Rechercher un trajet</a>
+    </div>
+  </div>
+
+  <!-- STEPPER -->
+  <div class="stepper">
+    <div class="step active"><div class="num">1</div><span class="label">Rechercher</span></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="num">2</div><span class="label">Sélectionner</span></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="num">3</div><span class="label">Passagers</span></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="num">4</div><span class="label">Paiement</span></div>
+  </div>
+
+  <!-- SEARCH BODY -->
+  <div class="search-body">
+    <div class="search-form-panel">
+      <h2>Rechercher un trajet</h2>
+
+      <div class="status-banner" id="statusBanner"></div>
+
+      <form id="searchForm" novalidate>
+        <div class="trip-type">
+          <label><input type="radio" name="tripType" value="aller-simple" checked> Aller simple</label>
+          <label><input type="radio" name="tripType" value="aller-retour"> Aller-retour</label>
+        </div>
+
+        <div class="row">
+          <div class="field" id="f-depart">
+            <label for="depart">Départ</label>
+            <div class="input-wrap">
+              <svg class="leading" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <select id="depart" style="width:100%; padding:12px 14px 12px 42px; border:1.5px solid var(--border); border-radius:9px; font-size:14px; font-family:'Inter',sans-serif; color:var(--ink); background:#fff; appearance:none;">
+                <option value="">Choisir une ville</option>
+                <option>Yaoundé</option>
+                <option>Douala</option>
+                <option>Bafoussam</option>
+                <option>Bertoua</option>
+                <option>Garoua</option>
+              </select>
+            </div>
+            <div class="err-msg">Veuillez choisir une ville de départ.</div>
+          </div>
+          <div class="field" id="f-arrivee">
+            <label for="arrivee">Arrivée</label>
+            <div class="input-wrap">
+              <svg class="leading" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <select id="arrivee" style="width:100%; padding:12px 14px 12px 42px; border:1.5px solid var(--border); border-radius:9px; font-size:14px; font-family:'Inter',sans-serif; color:var(--ink); background:#fff; appearance:none;">
+                <option value="">Choisir une ville</option>
+                <option>Douala</option>
+                <option>Yaoundé</option>
+                <option>Bafoussam</option>
+                <option>Bertoua</option>
+                <option>Garoua</option>
+              </select>
+            </div>
+            <div class="err-msg">Veuillez choisir une ville d'arrivée.</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field" id="f-date">
+            <label for="dateDepart">Date de départ</label>
+            <div class="input-wrap">
+              <input type="date" id="dateDepart">
+            </div>
+            <div class="err-msg">Veuillez choisir une date.</div>
+          </div>
+          <div class="field">
+            <label for="passagers">Nombre de passagers</label>
+            <div class="input-wrap">
+              <select id="passagers" style="width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:9px; font-size:14px; font-family:'Inter',sans-serif; color:var(--ink); background:#fff; appearance:none;">
+                <option>1 Passager</option>
+                <option>2 Passagers</option>
+                <option>3 Passagers</option>
+                <option>4 Passagers</option>
+                <option>5+ Passagers</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="submitBtn">Rechercher</button>
+      </form>
+    </div>
+
+    <div class="search-image-panel">
+      <img src="https://images.pexels.com/photos/15670/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1200" alt="Bus CAM travel sur une route de montagne">
+    </div>
+  </div>
+
+<script src="js/nav-toggle.js"></script>
+<script src="js/script-recherche.js"></script>
+<script src="js/chatbot.js"></script>
+</body>
+</html>
