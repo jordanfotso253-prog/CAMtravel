@@ -38,7 +38,17 @@ form.addEventListener('submit', async (e) => {
       const { error } = await window.camtravelSupabase.auth.signInWithPassword({ email: identifiant, password: pass });
       if (error) throw error;
       banner.textContent = "Connexion réussie ! Redirection vers votre tableau de bord...";
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+
+      let destination = 'dashboard.html';
+      try {
+        if (typeof camtravelIsAdminEmail === 'function' && await camtravelIsAdminEmail(identifiant)) {
+          destination = 'admin-dashboard.html';
+        } else if (typeof camtravelGetMyAgency === 'function' && await camtravelGetMyAgency()) {
+          destination = 'agency-dashboard.html';
+        }
+      } catch (e) { /* en cas de doute, direction le tableau de bord client */ }
+
+      setTimeout(() => { window.location.href = destination; }, 1000);
     } catch (err) {
       banner.className = 'status-banner show error';
       const messages = {

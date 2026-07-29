@@ -9,6 +9,8 @@ const price = Number(params.get('price') || 12500);
 const passagers = Number(params.get('passagers') || 1);
 const passagerNom = params.get('passagerNom') || 'Client';
 const passagerTel = params.get('passagerTel') || '';
+const tripId = params.get('tripId') || null;
+const seatNumbers = params.get('seats') || null;
 
 function formatDate(iso) {
   const d = new Date(iso);
@@ -54,7 +56,8 @@ form.addEventListener('submit', async (e) => {
       ref, company, from, to, date, dep,
       price, passagers, total,
       passagerNom, passagerTel,
-      method, methodLabel: methodLabels[method] || method
+      method, methodLabel: methodLabels[method] || method,
+      tripId, seatNumbers
     });
   }
 

@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<script src="js/theme.js"></script>
 </head>
 <body>
 <div class="dash-layout">
@@ -32,9 +33,21 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M21 3l-9 9"/><path d="M15 3h6v6"/></svg>
         Mes trajets
       </a>
+      <a href="tracking.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        Suivi
+      </a>
       <a href="mes-paiements.html">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/></svg>
         Paiements
+      </a>
+      <a href="refunds.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v6h6"/><path d="M3 13a9 9 0 1 0 3-7.7L3 8"/></svg>
+        Remboursements
+      </a>
+      <a href="notifications.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Notifications
       </a>
       <a href="profil.html">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -112,8 +125,9 @@
           <div class="s-title">Thème</div>
           <div class="s-sub">Apparence claire ou sombre</div>
         </div>
-        <select class="select-input" style="width:auto; padding:8px 12px;" disabled>
-          <option>Clair (sombre bientôt disponible)</option>
+        <select class="select-input" id="themeSelect" style="width:auto; padding:8px 12px;">
+          <option value="light">Clair</option>
+          <option value="dark">Sombre</option>
         </select>
       </div>
     </div>
@@ -130,6 +144,10 @@
     </div>
   </main>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/data-store.js"></script>
+<script src="js/auth-guard.js"></script>
 <script src="js/script-parametres.js"></script>
 <script src="js/chatbot.js"></script>
 </body>

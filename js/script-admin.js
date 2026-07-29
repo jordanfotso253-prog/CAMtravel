@@ -104,6 +104,43 @@ async function initAdminDashboard() {
       `).join('');
     }
   }
+
+  // ---- Demandes de remboursement ----
+  const refundContainer = document.getElementById('refundRequestsList');
+  if (refundContainer) {
+    const pending = realReservations.filter(r => r.refundStatus === 'requested');
+    if (pending.length === 0) {
+      refundContainer.innerHTML = `<div class="empty-state">Aucune demande en attente.</div>`;
+    } else {
+      refundContainer.innerHTML = pending.map(r => `
+        <div class="admin-trip-row" data-refund-row="${r.id}">
+          <div>
+            <div class="trip-ref">${r.ref}</div>
+            <div class="trip-route">${r.from} → ${r.to}</div>
+            <div class="trip-meta">${r.passagerNom || ''} · ${Number(r.total || 0).toLocaleString('fr-FR')} FCFA${r.refundReason ? ' · « ' + r.refundReason + ' »' : ''}</div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn-secondary" data-refund-action="approved" data-id="${r.id}" style="width:auto; padding:8px 14px;">Approuver</button>
+            <button type="button" class="btn-secondary" data-refund-action="rejected" data-id="${r.id}" style="width:auto; padding:8px 14px;">Refuser</button>
+          </div>
+        </div>
+      `).join('');
+
+      refundContainer.querySelectorAll('[data-refund-action]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          btn.closest('[data-refund-row]').style.opacity = '0.5';
+          const ok = typeof camtravelSetRefundStatus === 'function'
+            ? await camtravelSetRefundStatus(btn.dataset.id, btn.dataset.refundAction)
+            : false;
+          if (ok) {
+            btn.closest('[data-refund-row]').remove();
+          } else {
+            btn.closest('[data-refund-row]').style.opacity = '1';
+          }
+        });
+      });
+    }
+  }
 }
 
 initAdminDashboard();

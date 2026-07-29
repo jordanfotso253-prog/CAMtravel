@@ -12,46 +12,53 @@ function formatDate(iso) {
 
 document.getElementById('routeTitle').textContent = `${from} → ${to} | ${formatDate(date)}`;
 
-// Jeu de données de démonstration (dans une vraie app : réponse d'une API/base de données)
-const trips = [
-  { id: 'CAM', company: 'CAM travel', dep: '08:00 AM', arr: '10:30 AM', duration: '2h30m', price: 12500, tags: ['VIP', 'Climatisé', 'WiFi'] },
-  { id: 'EXP', company: 'Express Voyages', dep: '08:00 AM', arr: '11:30 AM', duration: '2h30m', price: 11000, tags: ['VIP', 'Climatisé', 'WiFi'] },
-  { id: 'GEN', company: 'General Express', dep: '10:00 AM', arr: '12:30 PM', duration: '2h30m', price: 13000, tags: ['VIP', 'Climatisé', 'WiFi'] },
-  { id: 'ROY', company: 'Royal Bus', dep: '11:00 AM', arr: '01:30 PM', duration: '2h30m', price: 12000, tags: ['VIP', 'Climatisé', 'WiFi'] },
-  { id: 'DRM', company: 'Dream Transport', dep: '01:00 PM', arr: '03:30 PM', duration: '2h30m', price: 11500, tags: ['VIP', 'Climatisé', 'WiFi'] },
-];
-
-document.getElementById('countLabel').textContent = `${trips.length} trajets trouvés`;
-
 const list = document.getElementById('tripList');
+const countLabel = document.getElementById('countLabel');
 
-trips.forEach(trip => {
-  const card = document.createElement('div');
-  card.className = 'trip-card';
+function renderTrips(trips) {
+  countLabel.textContent = `${trips.length} trajet${trips.length > 1 ? 's' : ''} trouvé${trips.length > 1 ? 's' : ''}`;
 
-  const initials = trip.company.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  if (trips.length === 0) {
+    list.innerHTML = `<div class="empty-state">Aucun trajet pour ce parcours à cette date. Essayez une autre ville ou une autre date.</div>`;
+    return;
+  }
 
-  card.innerHTML = `
-    <div class="company">
-      <div class="company-badge">${initials}</div>
-      <div>
-        <div class="company-name">${trip.company}</div>
-        <div class="trip-tags">
-          ${trip.tags.map(t => `<span class="trip-tag">${t}</span>`).join('')}
+  list.innerHTML = '';
+  trips.forEach(trip => {
+    const card = document.createElement('div');
+    card.className = 'trip-card';
+
+    const initials = trip.company.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+    card.innerHTML = `
+      <div class="company">
+        <div class="company-badge">${initials}</div>
+        <div>
+          <div class="company-name">${trip.company}</div>
+          <div class="trip-tags">
+            ${trip.tags.map(t => `<span class="trip-tag">${t}</span>`).join('')}
+          </div>
         </div>
       </div>
-    </div>
-    <div class="trip-times">
-      <span class="time">${trip.dep}</span>
-      <span class="arrow">→<span class="dur">${trip.duration}</span></span>
-      <span class="time">${trip.arr}</span>
-    </div>
-    <div class="price">${trip.price.toLocaleString('fr-FR')} FCFA</div>
-    <a class="btn-choisir" href="detail-trajet.html?${new URLSearchParams({
-      company: trip.company, dep: trip.dep, arr: trip.arr, duration: trip.duration,
-      price: trip.price, tags: trip.tags.join(','), from, to, date
-    }).toString()}">Choisir</a>
-  `;
+      <div class="trip-times">
+        <span class="time">${trip.dep}</span>
+        <span class="arrow">→<span class="dur">${trip.duration || ''}</span></span>
+        <span class="time">${trip.arr}</span>
+      </div>
+      <div class="price">${Number(trip.price).toLocaleString('fr-FR')} FCFA</div>
+      <a class="btn-choisir" href="detail-trajet.html?${new URLSearchParams({
+        tripId: trip.id, company: trip.company, dep: trip.dep, arr: trip.arr,
+        duration: trip.duration || '', price: trip.price, tags: trip.tags.join(','),
+        seatCount: trip.seatCount, from, to, date
+      }).toString()}">Choisir</a>
+    `;
 
-  list.appendChild(card);
-});
+    list.appendChild(card);
+  });
+}
+
+(async function init() {
+  list.innerHTML = `<div class="empty-state">Recherche des trajets…</div>`;
+  const trips = typeof camtravelGetTrips === 'function' ? await camtravelGetTrips({ from, to }) : [];
+  renderTrips(trips);
+})();

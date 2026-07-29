@@ -32,10 +32,37 @@ function showSaved() {
   });
 });
 
-document.getElementById('deleteAccountBtn').addEventListener('click', () => {
+// ---- Thème clair / sombre ----
+const themeSelect = document.getElementById('themeSelect');
+if (themeSelect) {
+  themeSelect.value = typeof camtravelGetTheme === 'function' ? camtravelGetTheme() : 'light';
+  themeSelect.addEventListener('change', () => {
+    if (typeof camtravelSetTheme === 'function') camtravelSetTheme(themeSelect.value);
+    showSaved();
+  });
+}
+
+document.getElementById('deleteAccountBtn').addEventListener('click', async () => {
   const confirmed = confirm("Voulez-vous vraiment supprimer votre compte ? Cette action est irréversible.");
-  if (confirmed) {
-    banner.className = 'status-banner show error';
-    banner.textContent = "Suppression de compte : fonctionnalité de démonstration — nécessite un vrai système de comptes côté serveur pour être effective.";
+  if (!confirmed) return;
+
+  const btn = document.getElementById('deleteAccountBtn');
+  btn.disabled = true;
+
+  const result = typeof camtravelDeleteOwnAccount === 'function'
+    ? await camtravelDeleteOwnAccount()
+    : { ok: false, reason: 'no-supabase' };
+
+  if (result.ok) {
+    banner.className = 'status-banner show success';
+    banner.textContent = "Compte supprimé. À bientôt !";
+    setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+    return;
   }
+
+  btn.disabled = false;
+  banner.className = 'status-banner show error';
+  banner.textContent = result.reason === 'no-supabase'
+    ? "La suppression de compte nécessite Supabase configuré (indisponible en mode démo local)."
+    : "Impossible de supprimer le compte pour le moment. Réessayez.";
 });

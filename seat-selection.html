@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CAM travel — Résultats de recherche</title>
+<title>CAM travel — Sélection des sièges</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
@@ -31,29 +31,46 @@
   <div class="stepper">
     <div class="step"><div class="num">1</div><span class="label">Rechercher</span></div>
     <div class="step-line"></div>
-    <div class="step active"><div class="num">2</div><span class="label">Sélectionner</span></div>
+    <div class="step"><div class="num">2</div><span class="label">Sélectionner</span></div>
     <div class="step-line"></div>
-    <div class="step"><div class="num">3</div><span class="label">Sièges</span></div>
+    <div class="step active"><div class="num">3</div><span class="label">Sièges</span></div>
     <div class="step-line"></div>
     <div class="step"><div class="num">4</div><span class="label">Passagers</span></div>
     <div class="step-line"></div>
     <div class="step"><div class="num">5</div><span class="label">Paiement</span></div>
   </div>
 
-  <div class="results-wrap">
-    <div class="results-header">
-      <h2 id="routeTitle">Yaoundé → Douala | 08 Juin 2024</h2>
-      <span id="countLabel">12 trajets trouvés</span>
-    </div>
+  <div class="passenger-wrap">
+    <div class="passenger-card">
+      <h2>Choisissez vos sièges</h2>
+      <p id="tripSummary" style="margin:-12px 0 22px; font-size:13px; color:var(--gray-text);"></p>
 
-    <div id="tripList"></div>
+      <div class="status-banner" id="statusBanner"></div>
+
+      <div class="seat-front">🚌 Avant du bus</div>
+      <div class="seat-map" id="seatMap"></div>
+
+      <div class="seat-legend">
+        <span><span class="dot" style="background:#fff; border:1.5px solid var(--border);"></span>Libre</span>
+        <span><span class="dot" style="background:var(--green-deep);"></span>Sélectionné</span>
+        <span><span class="dot" style="background:#f1f2f1;"></span>Occupé</span>
+      </div>
+
+      <div class="seat-summary-bar">
+        <div>
+          <div class="label" style="font-size:12px; color:var(--gray-text);" id="seatCountLabel">0 siège sélectionné</div>
+          <div class="value" style="font-size:18px; font-weight:700; color:var(--ink);" id="totalPriceLabel">0 FCFA</div>
+        </div>
+        <button type="button" class="btn-primary" id="continueBtn" style="width:auto; padding:13px 28px;" disabled>Continuer</button>
+      </div>
+    </div>
   </div>
 
+<script src="js/nav-toggle.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/data-store.js"></script>
-<script src="js/nav-toggle.js"></script>
-<script src="js/script-resultats.js"></script>
+<script src="js/script-seat-selection.js"></script>
 <script src="js/chatbot.js"></script>
 </body>
 </html>

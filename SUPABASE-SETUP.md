@@ -63,3 +63,12 @@ doit cliquer un lien reçu par email avant de pouvoir se connecter.
 
 Tant que les clés ne sont pas renseignées, tout continue de fonctionner
 exactement comme avant (mode local dans le navigateur).
+
+## Mise à jour : activation du profil, des paiements et des notifications
+
+`supabase-schema.sql` a été complété (photo de profil, lien entre une
+réservation et son compte, suppression de compte). Pour que ces
+fonctionnalités marchent avec votre projet Supabase existant : **SQL
+Editor → New query → recollez tout le contenu de `supabase-schema.sql`
+→ Run.** Le fichier est conçu pour être ré-exécuté sans danger : il ne
+fait qu'ajouter ce qui manque, aucune donnée existante n'est touchée.

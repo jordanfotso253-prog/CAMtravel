@@ -1,9 +1,3 @@
-const DEMO_TRIPS = [
-  { ref: 'YA001', from: 'Yaoundé', to: 'Douala', date: '2024-06-26', dep: '08:00 AM', total: 12500 },
-  { ref: 'YA002', from: 'Douala', to: 'Bafoussam', date: '2024-06-10', dep: '10:00 AM', total: 10000 },
-  { ref: 'YA003', from: 'Bertoua', to: 'Yaoundé', date: '2024-06-12', dep: '09:00 AM', total: 15000 },
-];
-
 function formatDateFr(iso) {
   const d = new Date(iso);
   if (isNaN(d)) return iso;
@@ -36,8 +30,7 @@ function renderList(containerId, list, emptyLabel) {
 }
 
 (async function init() {
-  const real = typeof camtravelGetReservations === 'function' ? await camtravelGetReservations() : [];
-  const all = [...real, ...DEMO_TRIPS];
+  const all = typeof camtravelGetReservations === 'function' ? await camtravelGetReservations({ onlyMine: true }) : [];
 
   const upcoming = all.filter(r => isUpcoming(r.date)).sort((a, b) => new Date(a.date) - new Date(b.date));
   const past = all.filter(r => !isUpcoming(r.date)).sort((a, b) => new Date(b.date) - new Date(a.date));

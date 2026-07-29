@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CAM travel — Mes réservations</title>
+<title>CAM travel — Remboursements</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
@@ -29,7 +29,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
         Colis
       </a>
-      <a href="mes-trajets.html" class="active">
+      <a href="mes-trajets.html">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M21 3l-9 9"/><path d="M15 3h6v6"/></svg>
         Mes trajets
       </a>
@@ -41,7 +41,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/></svg>
         Paiements
       </a>
-      <a href="refunds.html">
+      <a href="refunds.html" class="active">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v6h6"/><path d="M3 13a9 9 0 1 0 3-7.7L3 8"/></svg>
         Remboursements
       </a>
@@ -70,19 +70,19 @@
 
   <main class="dash-main">
     <div class="page-header-row">
-      <h2>Mes trajets</h2>
-      <a href="recherche.html" class="btn-nav" style="text-decoration:none;">+ Nouveau trajet</a>
+      <h2>Remboursements</h2>
     </div>
 
-    <div class="dash-grid">
-      <div class="panel">
-        <h3>🟢 Trajets à venir</h3>
-        <div id="upcomingList"></div>
-      </div>
-      <div class="panel">
-        <h3>⚪ Trajets passés</h3>
-        <div id="pastList"></div>
-      </div>
+    <div class="status-banner" id="statusBanner"></div>
+
+    <div class="panel">
+      <h3>Réservations éligibles</h3>
+      <div id="eligibleList"></div>
+    </div>
+
+    <div class="panel" style="margin-top:20px;">
+      <h3>Mes demandes</h3>
+      <div id="requestsList"></div>
     </div>
   </main>
 </div>
@@ -90,7 +90,7 @@
 <script src="js/supabase-config.js"></script>
 <script src="js/data-store.js"></script>
 <script src="js/auth-guard.js"></script>
-<script src="js/script-mes-trajets.js"></script>
+<script src="js/script-refunds.js"></script>
 <script src="js/chatbot.js"></script>
 </body>
 </html>

@@ -36,8 +36,8 @@
  * ============================================================
  */
 
-const SUPABASE_URL = "REMPLACER_SUPABASE_URL";
-const SUPABASE_ANON_KEY = "REMPLACER_SUPABASE_ANON_KEY";
+const SUPABASE_URL = "https://wddprzhujtnofxaeznfx.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_BBzgb7lecv97Xxd_oKG4lQ_UZYbQh4L";
 
 // Détecte automatiquement si les clés ont été remplies
 window.CAMTRAVEL_SUPABASE_ENABLED =

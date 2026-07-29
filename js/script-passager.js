@@ -4,15 +4,19 @@ const addBtn = document.getElementById('addPassengerBtn');
 const form = document.getElementById('passengerForm');
 const banner = document.getElementById('statusBanner');
 
+// Sièges choisis à l'étape précédente (un passager par siège sélectionné).
+const seats = (params.get('seats') || '').split(',').map(s => s.trim()).filter(Boolean);
+
 let passengerCount = 0;
 
 function addPassengerBlock() {
   passengerCount++;
   const n = passengerCount;
+  const seatLabel = seats[n - 1] ? ` — Siège ${seats[n - 1]}` : '';
   const block = document.createElement('div');
   block.className = 'passenger-block';
   block.innerHTML = `
-    <h3>Passager ${n}</h3>
+    <h3>Passager ${n}${seatLabel}</h3>
     <div class="row">
       <div class="field" id="f-nom-${n}">
         <label for="nom-${n}">Nom complet</label>
@@ -97,8 +101,13 @@ function addPassengerBlock() {
   });
 }
 
-addPassengerBlock(); // Passager 1 par défaut
-addBtn.addEventListener('click', addPassengerBlock);
+if (seats.length > 0) {
+  seats.forEach(() => addPassengerBlock());
+  addBtn.style.display = 'none'; // le nombre de passagers est fixé par les sièges choisis
+} else {
+  addPassengerBlock(); // Passager 1 par défaut (accès direct à la page, sans sélection de sièges)
+  addBtn.addEventListener('click', addPassengerBlock);
+}
 
 function setError(fieldId, hasError) {
   const el = document.getElementById(fieldId);
