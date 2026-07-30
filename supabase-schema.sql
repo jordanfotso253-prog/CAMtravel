@@ -137,46 +137,200 @@ create index if not exists idx_trips_route on public.trips(from_city, to_city);
 
 -- ============================================================
 -- Sécurité (Row Level Security)
--- Réglage simple pour démarrer : lecture/écriture ouvertes sur les
--- données de l'app, équivalent de la règle Firestore de départ
--- ("allow read, write: if true"). La table "admins" reste en
--- lecture seule via l'API : vous ajoutez les administrateurs à la
--- main dans l'éditeur de table Supabase, jamais depuis le site.
--- À resserrer plus tard si besoin (ex: limiter "reservations" au
--- propriétaire une fois l'authentification pleinement exploitée).
+-- Chacun ne voit/modifie que SES propres données : un client (via
+-- son user_id), une agence (via les trajets qui lui appartiennent),
+-- ou un admin (via la table "admins", vérifiée par la fonction
+-- camtravel_is_admin() ci-dessous). Ce réglage remplace l'ancien
+-- "lecture/écriture ouvertes à tout le monde" qui équivalait à
+-- "allow read, write: if true" — testé de bout en bout (client,
+-- invité, agence, admin) avant d'être mis ici.
 --
 -- Les "drop policy if exists" ci-dessous servent uniquement à rendre
 -- ce fichier ré-exécutable sans erreur ; ils ne suppriment aucune
--- donnée, seulement la règle d'accès qui est aussitôt recréée à
--- l'identique juste en dessous.
+-- donnée, seulement la règle d'accès qui est aussitôt recréée juste
+-- en dessous.
 -- ============================================================
+
+-- ---------- Fonctions utilitaires (utilisées dans les policies) ----------
+create or replace function public.camtravel_is_admin()
+returns boolean
+language sql
+security definer
+set search_path = ''
+stable
+as $$
+  select exists (
+    select 1 from public.admins
+    where email = lower(coalesce(auth.jwt() ->> 'email', ''))
+    and is_admin = true
+  );
+$$;
+
+create or replace function public.camtravel_owns_agency(p_agency_id uuid)
+returns boolean
+language sql
+security definer
+set search_path = ''
+stable
+as $$
+  select exists (
+    select 1 from public.agencies
+    where id = p_agency_id
+    and email = lower(coalesce(auth.jwt() ->> 'email', ''))
+  );
+$$;
+
+create or replace function public.camtravel_trip_is_mine(p_trip_id uuid)
+returns boolean
+language sql
+security definer
+set search_path = ''
+stable
+as $$
+  select exists (
+    select 1 from public.trips t
+    join public.agencies a on a.id = t.agency_id
+    where t.id = p_trip_id
+    and a.email = lower(coalesce(auth.jwt() ->> 'email', ''))
+  );
+$$;
+
+-- IMPORTANT : Supabase accorde EXECUTE automatiquement à anon ET
+-- authenticated (en plus du comportement standard de Postgres qui
+-- accorde EXECUTE à PUBLIC) sur toute fonction nouvellement créée
+-- dans "public". On révoque donc explicitement les TROIS avant de
+-- regrant précisément aux rôles voulus : sinon une fonction censée
+-- être réservée à "authenticated" resterait en réalité appelable par
+-- n'importe quel visiteur non connecté (anon) aussi.
+revoke execute on function public.camtravel_is_admin() from public, anon, authenticated;
+revoke execute on function public.camtravel_owns_agency(uuid) from public, anon, authenticated;
+revoke execute on function public.camtravel_trip_is_mine(uuid) from public, anon, authenticated;
+
+grant execute on function public.camtravel_is_admin() to anon, authenticated;
+grant execute on function public.camtravel_owns_agency(uuid) to anon, authenticated;
+grant execute on function public.camtravel_trip_is_mine(uuid) to anon, authenticated;
+
+-- ---------- PROFILES : chacun voit/modifie sa propre ligne, l'admin voit tout ----------
 alter table public.profiles enable row level security;
+
 drop policy if exists "profiles_all" on public.profiles;
-create policy "profiles_all" on public.profiles for all using (true) with check (true);
 
+drop policy if exists "profiles_select" on public.profiles;
+create policy "profiles_select" on public.profiles for select
+  using (auth.uid() = id or public.camtravel_is_admin());
+
+drop policy if exists "profiles_insert" on public.profiles;
+create policy "profiles_insert" on public.profiles for insert
+  with check (auth.uid() = id);
+
+drop policy if exists "profiles_update" on public.profiles;
+create policy "profiles_update" on public.profiles for update
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
+
+-- ---------- RESERVATIONS : propriétaire + admin + agence concernée ----------
 alter table public.reservations enable row level security;
+
 drop policy if exists "reservations_all" on public.reservations;
-create policy "reservations_all" on public.reservations for all using (true) with check (true);
 
+drop policy if exists "reservations_select" on public.reservations;
+create policy "reservations_select" on public.reservations for select
+  using (
+    auth.uid() = user_id
+    or public.camtravel_is_admin()
+    or public.camtravel_trip_is_mine(trip_id)
+  );
+
+drop policy if exists "reservations_insert" on public.reservations;
+create policy "reservations_insert" on public.reservations for insert
+  with check (user_id is null or auth.uid() = user_id);
+
+drop policy if exists "reservations_update" on public.reservations;
+create policy "reservations_update" on public.reservations for update
+  using (public.camtravel_is_admin())
+  with check (public.camtravel_is_admin());
+
+drop policy if exists "reservations_delete" on public.reservations;
+create policy "reservations_delete" on public.reservations for delete
+  using (auth.uid() = user_id);
+
+-- ---------- COLIS : n'importe qui peut envoyer, seul l'admin peut consulter ----------
+-- (pas de compte associé aux colis dans ce projet)
 alter table public.colis enable row level security;
+
 drop policy if exists "colis_all" on public.colis;
-create policy "colis_all" on public.colis for all using (true) with check (true);
 
+drop policy if exists "colis_insert" on public.colis;
+create policy "colis_insert" on public.colis for insert
+  with check (true);
+
+drop policy if exists "colis_select" on public.colis;
+create policy "colis_select" on public.colis for select
+  using (public.camtravel_is_admin());
+
+-- ---------- PASSENGERS : idem colis (infos pièce d'identité, admin seul en lecture) ----------
 alter table public.passengers enable row level security;
+
 drop policy if exists "passengers_all" on public.passengers;
-create policy "passengers_all" on public.passengers for all using (true) with check (true);
 
+drop policy if exists "passengers_insert" on public.passengers;
+create policy "passengers_insert" on public.passengers for insert
+  with check (true);
+
+drop policy if exists "passengers_select" on public.passengers;
+create policy "passengers_select" on public.passengers for select
+  using (public.camtravel_is_admin());
+
+-- ---------- ADMINS : lecture réservée aux comptes connectés (pas au grand public) ----------
 alter table public.admins enable row level security;
+
 drop policy if exists "admins_read" on public.admins;
-create policy "admins_read" on public.admins for select using (true);
+create policy "admins_read" on public.admins for select
+  using (auth.role() = 'authenticated');
 
+-- ---------- AGENCIES : lecture publique (recherche sans compte), écriture réservée ----------
+-- à l'admin (ou à l'agence elle-même pour sa propre ligne). La lecture reste
+-- ouverte à tous car le nom de l'agence doit s'afficher dans les résultats
+-- de recherche même pour un visiteur non connecté.
 alter table public.agencies enable row level security;
-drop policy if exists "agencies_all" on public.agencies;
-create policy "agencies_all" on public.agencies for all using (true) with check (true);
 
+drop policy if exists "agencies_all" on public.agencies;
+
+drop policy if exists "agencies_select" on public.agencies;
+create policy "agencies_select" on public.agencies for select
+  using (true);
+
+drop policy if exists "agencies_insert" on public.agencies;
+create policy "agencies_insert" on public.agencies for insert
+  with check (public.camtravel_is_admin());
+
+drop policy if exists "agencies_update" on public.agencies;
+create policy "agencies_update" on public.agencies for update
+  using (public.camtravel_is_admin() or email = lower(coalesce(auth.jwt() ->> 'email', '')))
+  with check (public.camtravel_is_admin() or email = lower(coalesce(auth.jwt() ->> 'email', '')));
+
+-- ---------- TRIPS : lecture publique (recherche sans compte) ----------
+-- écriture réservée à l'agence propriétaire du trajet (ou à l'admin)
 alter table public.trips enable row level security;
+
 drop policy if exists "trips_all" on public.trips;
-create policy "trips_all" on public.trips for all using (true) with check (true);
+
+drop policy if exists "trips_select" on public.trips;
+create policy "trips_select" on public.trips for select
+  using (true);
+
+drop policy if exists "trips_insert" on public.trips;
+create policy "trips_insert" on public.trips for insert
+  with check (public.camtravel_is_admin() or public.camtravel_owns_agency(agency_id));
+
+drop policy if exists "trips_update" on public.trips;
+create policy "trips_update" on public.trips for update
+  using (public.camtravel_is_admin() or public.camtravel_owns_agency(agency_id))
+  with check (public.camtravel_is_admin() or public.camtravel_owns_agency(agency_id));
+
+drop policy if exists "trips_delete" on public.trips;
+create policy "trips_delete" on public.trips for delete
+  using (public.camtravel_is_admin() or public.camtravel_owns_agency(agency_id));
 
 -- ============================================================
 -- Suppression de compte par le client lui-même (page Paramètres)
@@ -202,7 +356,98 @@ begin
 end;
 $$;
 
+revoke execute on function public.camtravel_delete_own_account() from public, anon, authenticated;
 grant execute on function public.camtravel_delete_own_account() to authenticated;
+
+-- ============================================================
+-- Fonctions RPC pour les cas qui restent accessibles sans compte
+-- (sélection de siège, vérification de ticket à l'embarquement) ou
+-- qui doivent vérifier une appartenance avant d'écrire (demande de
+-- remboursement). Avant, ces cas nécessitaient une table entièrement
+-- ouverte ; chaque fonction ci-dessous ne fait QUE ce que son nom dit,
+-- rien d'autre n'est exposé.
+-- ============================================================
+
+-- Places déjà prises pour un trajet + une date : ne renvoie QUE les
+-- numéros de sièges, jamais les infos passager (nom, tél, prix...).
+-- Accessible sans compte (page de sélection de siège, avant paiement).
+create or replace function public.camtravel_get_occupied_seats(p_trip_id uuid, p_travel_date text)
+returns table(seat_numbers text)
+language sql
+security definer
+set search_path = ''
+stable
+as $$
+  select r.seat_numbers from public.reservations r
+  where r.trip_id = p_trip_id
+  and r.travel_date = p_travel_date
+  and r.seat_numbers is not null;
+$$;
+
+revoke execute on function public.camtravel_get_occupied_seats(uuid, text) from public, anon, authenticated;
+grant execute on function public.camtravel_get_occupied_seats(uuid, text) to anon, authenticated;
+
+-- Recherche d'un ticket par sa référence (page de vérification à
+-- l'embarquement). Reste accessible sans compte comme aujourd'hui,
+-- mais uniquement pour UNE référence exacte à la fois (impossible de
+-- lister/exporter toutes les réservations via cette fonction).
+create or replace function public.camtravel_find_reservation_by_ref(p_ref text)
+returns setof public.reservations
+language sql
+security definer
+set search_path = ''
+stable
+as $$
+  select * from public.reservations
+  where ref = upper(trim(p_ref))
+  limit 1;
+$$;
+
+revoke execute on function public.camtravel_find_reservation_by_ref(text) from public, anon, authenticated;
+grant execute on function public.camtravel_find_reservation_by_ref(text) to anon, authenticated;
+
+-- Marque un ticket comme utilisé (embarquement). Reste accessible sans
+-- compte comme aujourd'hui (page contrôleur), mais ne peut QUE changer
+-- used/used_at, jamais le prix, le passager ou toute autre colonne.
+create or replace function public.camtravel_mark_ticket_used(p_reservation_id uuid)
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  update public.reservations
+  set used = true, used_at = now()
+  where id = p_reservation_id;
+  return found;
+end;
+$$;
+
+revoke execute on function public.camtravel_mark_ticket_used(uuid) from public, anon, authenticated;
+grant execute on function public.camtravel_mark_ticket_used(uuid) to anon, authenticated;
+
+-- Demande de remboursement par le client connecté. Vérifie que la
+-- réservation lui appartient AVANT de modifier uniquement les colonnes
+-- de remboursement (jamais le prix, le statut "used", etc.).
+create or replace function public.camtravel_request_refund(p_reservation_id uuid, p_reason text)
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  update public.reservations
+  set refund_status = 'requested',
+      refund_reason = p_reason,
+      refund_requested_at = now()
+  where id = p_reservation_id
+  and user_id = auth.uid();
+  return found;
+end;
+$$;
+
+revoke execute on function public.camtravel_request_refund(uuid, text) from public, anon, authenticated;
+grant execute on function public.camtravel_request_refund(uuid, text) to authenticated;
 
 -- ============================================================
 -- Données de démarrage (agences + trajets d'exemple)
