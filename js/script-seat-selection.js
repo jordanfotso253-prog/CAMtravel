@@ -1,6 +1,11 @@
 const params = new URLSearchParams(window.location.search);
 const tripId = params.get('tripId') || '';
 const seatCount = parseInt(params.get('seatCount') || '40', 10);
+const agencyQuota = parseInt(params.get('agencyQuota') || '10', 10);
+// Sièges vendables en ligne = total - quota guichet (sièges réservés à l'agence)
+const webSeatLimit = typeof camtravelWebSeatLimit === 'function'
+  ? camtravelWebSeatLimit(seatCount, agencyQuota)
+  : Math.max(0, seatCount - Math.min(Math.max(agencyQuota, 0), seatCount));
 const company = params.get('company') || 'CAM travel';
 const from = params.get('from') || '';
 const to = params.get('to') || '';
@@ -14,7 +19,8 @@ function formatDate(iso) {
 }
 
 document.getElementById('tripSummary').textContent =
-  `${company} · ${from} → ${to} · ${formatDate(date)} · ${price.toLocaleString('fr-FR')} FCFA / passager`;
+  `${company} · ${from} → ${to} · ${formatDate(date)} · ${price.toLocaleString('fr-FR')} FCFA / passager` +
+  (agencyQuota > 0 ? ` · ${webSeatLimit} places en ligne` : '');
 
 const seatMap = document.getElementById('seatMap');
 const seatCountLabel = document.getElementById('seatCountLabel');
@@ -33,7 +39,9 @@ function renderSummary() {
 
 function buildSeatMap(occupied) {
   seatMap.innerHTML = '';
-  const rows = Math.ceil(seatCount / 4);
+  // Le client web ne voit que les sièges hors quota guichet
+  const visibleCount = webSeatLimit > 0 ? webSeatLimit : seatCount;
+  const rows = Math.ceil(visibleCount / 4);
   let seatNum = 1;
 
   for (let r = 0; r < rows; r++) {
@@ -42,7 +50,7 @@ function buildSeatMap(occupied) {
 
     for (let side = 0; side < 2; side++) {
       for (let col = 0; col < 2; col++) {
-        if (seatNum > seatCount) break;
+        if (seatNum > visibleCount) break;
         const num = seatNum++;
         const seatEl = document.createElement('button');
         seatEl.type = 'button';

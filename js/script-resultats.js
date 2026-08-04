@@ -49,7 +49,9 @@ function renderTrips(trips) {
       <a class="btn-choisir" href="detail-trajet.html?${new URLSearchParams({
         tripId: trip.id, company: trip.company, dep: trip.dep, arr: trip.arr,
         duration: trip.duration || '', price: trip.price, tags: trip.tags.join(','),
-        seatCount: trip.seatCount, from, to, date
+        seatCount: trip.seatCount,
+        agencyQuota: trip.agencyQuota != null ? trip.agencyQuota : 10,
+        from, to, date
       }).toString()}">Choisir</a>
     `;
 

@@ -41,8 +41,8 @@ const SUPABASE_ANON_KEY = "sb_publishable_BBzgb7lecv97Xxd_oKG4lQ_UZYbQh4L";
 
 // Détecte automatiquement si les clés ont été remplies
 window.CAMTRAVEL_SUPABASE_ENABLED =
-  SUPABASE_URL !== "REMPLACER_SUPABASE_URL" &&
-  SUPABASE_ANON_KEY !== "REMPLACER_SUPABASE_ANON_KEY";
+  SUPABASE_URL !== "https://wddprzhujtnofxaeznfx.supabase.co/rest/v1/" &&
+  SUPABASE_ANON_KEY !== "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkZHByemh1anRub2Z4YWV6bmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzOTc4NDQsImV4cCI6MjA5OTk3Mzg0NH0.8z_AAkVpokwyWmhxuWF0Mi6h-209khqE3tKsdJa29Ac";
 
 if (window.CAMTRAVEL_SUPABASE_ENABLED && typeof supabase !== 'undefined') {
   window.camtravelSupabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

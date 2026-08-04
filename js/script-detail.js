@@ -2,6 +2,7 @@ const params = new URLSearchParams(window.location.search);
 
 const tripId = params.get('tripId') || '';
 const seatCount = params.get('seatCount') || '40';
+const agencyQuota = params.get('agencyQuota') || '10';
 const company = params.get('company') || 'CAM travel';
 const dep = params.get('dep') || '08:00 AM';
 const arr = params.get('arr') || '10:30 AM';
@@ -34,5 +35,5 @@ document.getElementById('tagsRow').innerHTML = tags.map(t =>
 ).join('');
 
 // Transmet toutes les informations du trajet vers la sélection des sièges
-const nextParams = new URLSearchParams({ tripId, seatCount, company, dep, arr, duration, price, tags: tags.join(','), from, to, date });
+const nextParams = new URLSearchParams({ tripId, seatCount, agencyQuota, company, dep, arr, duration, price, tags: tags.join(','), from, to, date });
 document.getElementById('continueBtn').href = `seat-selection.html?${nextParams.toString()}`;

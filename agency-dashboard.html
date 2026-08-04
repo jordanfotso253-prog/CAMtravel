@@ -41,11 +41,17 @@
         <h2 id="agencyGreeting">Espace agence</h2>
         <p id="agencyStatusLine"></p>
       </div>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span id="pendingBadge" style="display:none; font-size:12.5px; font-weight:600; padding:6px 12px; border-radius:999px; background:#fff3e0; color:#c45c00; border:1px solid #ffd8a8;">
+          <span id="pendingCount">0</span> vente(s) en attente de sync
+        </span>
+        <button type="button" class="btn-secondary" id="syncPendingBtn" style="width:auto; padding:9px 16px; display:none;">Synchroniser</button>
+      </div>
     </div>
 
     <div class="status-banner" id="statusBanner"></div>
 
-    <div class="stat-cards" style="grid-template-columns:repeat(3,1fr); margin-bottom:22px;">
+    <div class="stat-cards" style="grid-template-columns:repeat(4,1fr); margin-bottom:22px;">
       <div class="stat-card">
         <div class="icon-box purple">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M21 3l-9 9"/><path d="M15 3h6v6"/></svg>
@@ -63,6 +69,12 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/></svg>
         </div>
         <div><p class="label">Chiffre d'affaires</p><p class="value" id="statRevenue">0 FCFA</p></div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-box purple">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        </div>
+        <div><p class="label">Hors ligne (file)</p><p class="value" id="statPending">0</p></div>
       </div>
     </div>
 
@@ -113,17 +125,119 @@
             <div class="input-wrap"><input type="number" id="tSeats" value="40" min="4" max="80"></div>
           </div>
           <div class="field">
+            <label for="tQuota">Quota guichet</label>
+            <div class="input-wrap"><input type="number" id="tQuota" value="10" min="0" max="40" title="Sièges réservés au guichet, non vendables en ligne"></div>
+          </div>
+          <div class="field">
             <label for="tTags">Équipements</label>
             <div class="input-wrap"><input type="text" id="tTags" placeholder="VIP,Climatisé,WiFi"></div>
           </div>
         </div>
+        <p style="font-size:12.5px; color:var(--gray-text); margin:0 0 14px;">Le <strong>quota guichet</strong> (ex. 10) réserve les derniers sièges à la vente en agence. Le web ne propose que les autres places — utile quand la connexion est instable.</p>
         <button type="submit" class="btn-primary" style="width:auto; padding:12px 26px;">Ajouter le trajet</button>
+      </form>
+    </div>
+
+    <!-- VENTE GUICHET -->
+    <div class="panel" style="margin-top:20px;" id="deskSalePanel">
+      <h3>Vente guichet</h3>
+      <p style="font-size:13px; color:var(--gray-text); margin:0 0 16px;">Enregistrez un billet vendu au comptoir. Fonctionne <strong>même sans Internet</strong> : la vente est synchronisée dès que le réseau revient.</p>
+      <form id="deskSaleForm">
+        <div class="row">
+          <div class="field">
+            <label for="dTrip">Trajet</label>
+            <select id="dTrip" required style="width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:9px; font-size:14px; font-family:'Inter',sans-serif; background:#fff;">
+              <option value="">Choisir un trajet</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="dDate">Date de voyage</label>
+            <div class="input-wrap"><input type="date" id="dDate" required></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="dNom">Nom du passager</label>
+            <div class="input-wrap"><input type="text" id="dNom" placeholder="Nom complet" required></div>
+          </div>
+          <div class="field">
+            <label for="dTel">Téléphone</label>
+            <div class="input-wrap"><input type="tel" id="dTel" placeholder="6XXXXXXXX" required></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="dSeats">Sièges (optionnel)</label>
+            <div class="input-wrap"><input type="text" id="dSeats" placeholder="Ex: 31,32 — laissez vide pour placement libre"></div>
+          </div>
+          <div class="field">
+            <label for="dMethod">Paiement</label>
+            <select id="dMethod" style="width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:9px; font-size:14px; font-family:'Inter',sans-serif; background:#fff;">
+              <option value="especes">Espèces</option>
+              <option value="mobile-money">Mobile Money</option>
+              <option value="carte">Carte bancaire</option>
+            </select>
+          </div>
+        </div>
+        <p id="dSeatHint" style="font-size:12.5px; color:var(--gray-text); margin:0 0 12px;"></p>
+        <div id="dSeatMap" style="margin-bottom:14px;"></div>
+        <button type="submit" class="btn-primary" style="width:auto; padding:12px 26px;">Enregistrer la vente</button>
       </form>
     </div>
 
     <div class="panel" style="margin-top:20px;">
       <h3>Mes trajets</h3>
       <div id="tripsList"></div>
+    </div>
+
+    <!-- ÉQUIPE + LICENCIEMENTS -->
+    <div class="panel" style="margin-top:20px;" id="teamPanel">
+      <h3>Équipe</h3>
+      <p style="font-size:13px; color:var(--gray-text); margin:0 0 14px;">Ajoutez des collaborateurs (caissier, responsable…). Un licenciement coupe l’accès mais conserve l’historique des ventes.</p>
+      <form id="teamAddForm" style="margin-bottom:18px;">
+        <div class="row">
+          <div class="field">
+            <label for="mEmail">Email du collaborateur</label>
+            <div class="input-wrap"><input type="email" id="mEmail" placeholder="caissier@exemple.com" required></div>
+          </div>
+          <div class="field">
+            <label for="mRole">Rôle</label>
+            <select id="mRole" style="width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:9px; font-size:14px; font-family:'Inter',sans-serif; background:#fff;">
+              <option value="cashier">Caissier (vente guichet)</option>
+              <option value="controller">Contrôleur (tickets)</option>
+              <option value="counter_manager">Responsable guichet</option>
+              <option value="regional_manager">Responsable ville</option>
+              <option value="owner">Propriétaire (PDG)</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" style="width:auto; padding:12px 26px;">Ajouter le membre</button>
+      </form>
+      <div style="display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
+        <button type="button" class="btn-secondary" data-team-filter="active" style="width:auto; padding:8px 14px;">Actifs</button>
+        <button type="button" class="btn-secondary" data-team-filter="all" style="width:auto; padding:8px 14px;">Tous (historique)</button>
+      </div>
+      <div id="teamList"></div>
+    </div>
+
+    <!-- SUCCURSALES (villes) -->
+    <div class="panel" style="margin-top:20px;" id="branchesPanel">
+      <h3>Succursales (villes)</h3>
+      <p style="font-size:13px; color:var(--gray-text); margin:0 0 14px;">Ex. Douala, Yaoundé — puis ajoutez des guichets (Akwa, Bonabéri…) pour chaque ville.</p>
+      <form id="branchForm" style="margin-bottom:16px;">
+        <div class="row">
+          <div class="field">
+            <label for="bName">Nom</label>
+            <div class="input-wrap"><input type="text" id="bName" placeholder="Agence Douala" required></div>
+          </div>
+          <div class="field">
+            <label for="bCity">Ville</label>
+            <div class="input-wrap"><input type="text" id="bCity" placeholder="Douala" required></div>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" style="width:auto; padding:12px 26px;">Ajouter la succursale</button>
+      </form>
+      <div id="branchesList"></div>
     </div>
 
     <div class="panel" style="margin-top:20px;">
