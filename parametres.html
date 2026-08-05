@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CAM travel — Mes réservations</title>
+<title>CAM travel — Paramètres</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="js/theme.js"></script>
+<script src="js/i18n.js"></script>
 </head>
-<body>
+<body class="role-client">
 <div class="dash-layout">
   <aside class="sidebar">
     <a href="dashboard.html" class="brand">
@@ -19,7 +20,7 @@
     <nav class="sidebar-nav">
       <a href="dashboard.html">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-        Tableau de bord
+        <span data-i18n="side.dashboard">Tableau de bord</span>
       </a>
       <a href="mes-reservations.html">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
@@ -55,14 +56,14 @@
       </a>
       <a href="parametres.html" class="active">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        Paramètres
+        <span data-i18n="side.settings">Paramètres</span>
       </a>
     </nav>
     <div class="sidebar-footer">
       <nav class="sidebar-nav">
         <a href="index.html" onclick="camtravelLogout(event)">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-          Déconnexion
+          <span data-i18n="side.logout">Déconnexion</span>
         </a>
       </nav>
     </div>
@@ -70,17 +71,17 @@
 
   <main class="dash-main">
     <div class="page-header-row">
-      <h2>Paramètres</h2>
+      <h2 data-i18n="settings.title">Paramètres</h2>
     </div>
 
     <div class="status-banner" id="statusBanner" style="max-width:600px;"></div>
 
     <div class="profile-card">
-      <h3 style="margin:0 0 4px;">Notifications</h3>
+      <h3 style="margin:0 0 4px;" data-i18n="settings.notifications">Notifications</h3>
       <div class="settings-row">
         <div>
-          <div class="s-title">Notifications par email</div>
-          <div class="s-sub">Confirmations de réservation, rappels de départ</div>
+          <div class="s-title" data-i18n="settings.email">Notifications par email</div>
+          <div class="s-sub" data-i18n="settings.email.sub">Confirmations de réservation, rappels de départ</div>
         </div>
         <label class="switch">
           <input type="checkbox" id="notifEmail" checked>
@@ -89,8 +90,8 @@
       </div>
       <div class="settings-row">
         <div>
-          <div class="s-title">Notifications SMS</div>
-          <div class="s-sub">Rappels par SMS avant le départ</div>
+          <div class="s-title" data-i18n="settings.sms">Notifications SMS</div>
+          <div class="s-sub" data-i18n="settings.sms.sub">Rappels par SMS avant le départ</div>
         </div>
         <label class="switch">
           <input type="checkbox" id="notifSms">
@@ -99,31 +100,46 @@
       </div>
       <div class="settings-row">
         <div>
-          <div class="s-title">Offres promotionnelles</div>
-          <div class="s-sub">Recevoir les réductions et offres spéciales</div>
+          <div class="s-title" data-i18n="settings.promo">Offres promotionnelles</div>
+          <div class="s-sub" data-i18n="settings.promo.sub">Recevoir les réductions et offres spéciales</div>
         </div>
         <label class="switch">
           <input type="checkbox" id="notifPromo" checked>
           <span class="slider"></span>
         </label>
       </div>
+      <div class="settings-row">
+        <div>
+          <div class="s-title">Notifications push (mobile)</div>
+          <div class="s-sub">Alertes sur votre téléphone : réservation, départ, remboursement</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="notifPush">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div id="pushStatus" style="font-size:12.5px; color:var(--gray-text); margin:0 0 8px;"></div>
+      <div class="settings-row" style="border-top:none; padding-top:0;">
+        <button type="button" class="btn-secondary" id="pushTestBtn" style="width:auto; padding:9px 16px;">Tester une notification</button>
+      </div>
     </div>
 
     <div class="profile-card" style="margin-top:18px;">
-      <h3 style="margin:0 0 4px;">Préférences</h3>
+      <h3 style="margin:0 0 4px;" data-i18n="settings.prefs">Préférences</h3>
       <div class="settings-row">
         <div>
-          <div class="s-title">Langue</div>
-          <div class="s-sub">Langue d'affichage du site</div>
+          <div class="s-title" data-i18n="settings.lang">Langue</div>
+          <div class="s-sub" data-i18n="settings.lang.sub">Langue d'affichage du site</div>
         </div>
-        <select class="select-input" style="width:auto; padding:8px 12px;" disabled>
-          <option>Français</option>
+        <select class="select-input" id="langSelect" style="width:auto; padding:8px 12px;">
+          <option value="fr">Français</option>
+          <option value="en">English</option>
         </select>
       </div>
       <div class="settings-row">
         <div>
-          <div class="s-title">Thème</div>
-          <div class="s-sub">Apparence claire ou sombre</div>
+          <div class="s-title" data-i18n="settings.theme">Thème</div>
+          <div class="s-sub" data-i18n="settings.theme.sub">Apparence claire ou sombre</div>
         </div>
         <select class="select-input" id="themeSelect" style="width:auto; padding:8px 12px;">
           <option value="light">Clair</option>
@@ -132,14 +148,31 @@
       </div>
     </div>
 
-    <div class="profile-card" style="margin-top:18px; border-color:#f3c2c2;">
-      <h3 style="margin:0 0 4px; color:#c62b2b;">Zone sensible</h3>
+    <div 
+    <div class="profile-card anim-fade-up" style="margin-top:16px;">
+      <h3 style="margin:0 0 4px;">Gestion des e-mails</h3>
+      <p style="font-size:12.5px; color:var(--gray-text); margin:0 0 14px;">Adresse utilisée et historique des notifications envoyées.</p>
+      <div class="settings-row" style="border:none;">
+        <div>
+          <div class="s-title">Adresse e-mail du compte</div>
+          <div class="s-sub" id="emailAccountLabel">Chargement…</div>
+        </div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <button type="button" class="btn-secondary" id="emailTestBtn" style="width:auto; padding:9px 16px;">Envoyer un e-mail de test</button>
+      </div>
+      <div id="emailProviderHint" style="font-size:12px; color:var(--gray-text); margin-bottom:12px;"></div>
+      <h4 style="margin:0 0 8px; font-size:14px;">Historique des e-mails</h4>
+      <div id="emailOutbox" class="email-outbox"><div class="empty-state" style="padding:12px;">Aucun e-mail pour l'instant.</div></div>
+    </div>
+class="profile-card" style="margin-top:18px; border-color:#f3c2c2;">
+      <h3 style="margin:0 0 4px; color:#c62b2b;" data-i18n="settings.danger">Zone sensible</h3>
       <div class="settings-row">
         <div>
-          <div class="s-title">Supprimer mon compte</div>
-          <div class="s-sub">Cette action est irréversible</div>
+          <div class="s-title" data-i18n="settings.delete">Supprimer mon compte</div>
+          <div class="s-sub" data-i18n="settings.delete.sub">Cette action est irréversible</div>
         </div>
-        <button type="button" class="btn-secondary" id="deleteAccountBtn" style="width:auto; padding:9px 18px; color:#c62b2b; border-color:#f3c2c2;">Supprimer</button>
+        <button type="button" class="btn-secondary" id="deleteAccountBtn" data-x="1" style="width:auto; padding:9px 18px; color:#c62b2b; border-color:#f3c2c2;" data-i18n="settings.delete.btn">Supprimer</button>
       </div>
     </div>
   </main>
@@ -147,7 +180,11 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/data-store.js"></script>
+<script src="js/email-notifications.js"></script>
+<script src="js/email-config.js"></script>
+<script src="js/notifications-store.js"></script>
 <script src="js/auth-guard.js"></script>
+<script src="js/push-notifications.js"></script>
 <script src="js/script-parametres.js"></script>
 <script src="js/chatbot.js"></script>
 </body>

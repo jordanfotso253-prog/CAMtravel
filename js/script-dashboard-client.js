@@ -9,13 +9,58 @@
     greetingEl.textContent = `Bonjour, ${(profile && profile.nom) || 'Client'} 👋`;
   }
 
+  function isUpcoming(dateStr) {
+    const d = new Date(dateStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return !isNaN(d) && d >= today;
+  }
+
   const totalReservations = real.length;
   const totalSpent = real.reduce((sum, r) => sum + Number(r.total || 0), 0);
+  const upcoming = real.filter(r => isUpcoming(r.date));
+  const past = real.filter(r => !isUpcoming(r.date));
 
   const elReservations = document.getElementById('statMyReservations');
   const elSpent = document.getElementById('statSpent');
+  const elUpcoming = document.getElementById('statUpcoming');
+  const elPast = document.getElementById('statPast');
   if (elReservations) elReservations.textContent = totalReservations;
   if (elSpent) elSpent.textContent = `${totalSpent.toLocaleString('fr-FR')} FCFA`;
+  if (elUpcoming) elUpcoming.textContent = upcoming.length;
+  if (elPast) elPast.textContent = past.length;
+
+  // Graphique mensuel client
+  const chartC = document.getElementById('monthlyChartClient');
+  if (chartC && typeof camtravelMonthlyStats !== 'undefined') {
+    const spent = camtravelMonthlyStats.aggregateByMonth(real, 6, r => Number(r.total || r.price || 0));
+    camtravelMonthlyStats.renderBarChart(chartC, spent, {
+      color: 'linear-gradient(180deg,#0b5c3d,#14b86a)',
+      height: 150,
+      format: v => v >= 1000 ? Math.round(v/1000) + 'k' : String(v)
+    });
+    // solid color fallback for gradient string in height bars
+    chartC.querySelectorAll('.mstat-bar').forEach(b => { b.style.background = '#0b5c3d'; });
+  }
+
+
+  const recentEl = document.getElementById('clientRecentList');
+  if (recentEl) {
+    if (real.length === 0) {
+      recentEl.innerHTML = `<div class="empty-state">Aucune réservation. <a href="recherche.html">Réserver un trajet</a></div>`;
+    } else {
+      recentEl.innerHTML = real.slice(0, 6).map(r => `
+        <div class="admin-trip-row">
+          <div>
+            <div class="trip-ref">${r.ref || ''} <span class="status-pill ${isUpcoming(r.date) ? 'upcoming' : 'past'}">${isUpcoming(r.date) ? 'À venir' : 'Passé'}</span></div>
+            <div class="trip-route">${r.from || ''} → ${r.to || ''}</div>
+            <div class="trip-meta">${r.date || ''} · ${r.dep || ''}</div>
+          </div>
+          <div class="trip-price">${Number(r.total || r.price || 0).toLocaleString('fr-FR')} FCFA</div>
+        </div>
+      `).join('');
+    }
+  }
 
   // ---- Notifications client (basées sur les réservations réelles du
   // compte connecté ; marquées comme lues à l'ouverture, par compte) ----
@@ -67,4 +112,41 @@
       notifDropdown.style.display = 'none';
     }
   });
+})();
+
+
+// Rappel de départ (si trajet dans les 2 prochaines heures et push activé)
+(async function departureReminders() {
+  if (typeof camtravelPush === 'undefined' || !camtravelPush.isPushEnabled()) return;
+  if (typeof camtravelGetReservations !== 'function') return;
+  const all = await camtravelGetReservations({ onlyMine: true });
+  const now = Date.now();
+  const key = 'camtravel_depart_reminded';
+  let reminded = {};
+  try { reminded = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
+  for (const r of all) {
+    if (!r.date || !r.dep || reminded[r.ref]) continue;
+    // parse simple
+    const parts = String(r.dep).trim().split(/\s+/);
+    let [h, m] = (parts[0] || '08:00').split(':').map(Number);
+    const mer = (parts[1] || '').toUpperCase();
+    if (mer === 'PM' && h !== 12) h += 12;
+    if (mer === 'AM' && h === 12) h = 0;
+    const d = new Date(r.date);
+    if (isNaN(d.getTime())) continue;
+    d.setHours(h || 8, m || 0, 0, 0);
+    const diff = d.getTime() - now;
+    if (diff > 0 && diff < 2 * 3600000) {
+      if (typeof camtravelNotify !== 'undefined') {
+        await camtravelNotify.departureReminder(r.ref, r.from, r.to);
+      } else if (typeof camtravelPush !== 'undefined') {
+        await camtravelPush.notifyDepartureReminder(r.ref, r.from, r.to, 'dans moins de 2 h');
+      }
+      if (typeof camtravelEmail !== 'undefined') {
+        try { await camtravelEmail.sendDepart({ ref: r.ref, from: r.from, to: r.to }); } catch (e) {}
+      }
+      reminded[r.ref] = true;
+    }
+  }
+  localStorage.setItem(key, JSON.stringify(reminded));
 })();

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAM travel — Réservations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme.js"></script>
+<script src="js/i18n.js"></script>
+</head>
+<body class="role-admin">
+<div class="dash-layout">
+  <aside class="sidebar">
+    <a href="admin-dashboard.html" class="brand">
+      <svg class="brand-mark" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="27" fill="#fff"/><path d="M4 28 A24 24 0 0 1 52 28 L52 30 A24 24 0 0 0 4 30 Z" fill="#0b5c3d"/><circle cx="20" cy="20" r="9" fill="#f5921b"/><path d="M10 40 L22 22 L30 34 L36 26 L46 40 Z" fill="#0b5c3d"/><path d="M6 44 Q28 34 50 44 L50 50 Q28 42 6 50 Z" fill="#0b5c3d"/></svg>
+      <div class="brand-text"><h1><span class="cam">CAM</span> <span class="travel">travel</span></h1></div>
+    </a>
+    <nav class="sidebar-nav">
+      <a href="admin-dashboard.html">Tableau de bord</a>
+      <a href="verify-ticket.html">Vérifier un ticket</a>
+      <a href="admin-users.html">Utilisateurs</a>
+      <a href="agencies.html">Agences</a>
+      <a href="commissions.html">Commissions</a>
+      <a href="admin-reservations.html" class="active">Réservations</a>
+      <a href="admin-vehicles.html">Véhicules</a>
+      <a href="admin-drivers.html">Conducteurs</a>
+      <a href="admin-parametres.html">Paramètres</a>
+    </nav>
+    <div class="sidebar-footer">
+      <nav class="sidebar-nav">
+        <a href="index.html" onclick="camtravelLogout(event)">Déconnexion</a>
+      </nav>
+    </div>
+  </aside>
+  <main class="dash-main anim-fade-up">
+    <div class="dash-role-strip">
+      <h2 style="margin:0;">Réservations</h2>
+      <span class="role-badge admin">Espace admin</span>
+    </div>
+    <div class="profile-card"><div id="resList" class="empty-state">Chargement…</div></div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/data-store.js"></script>
+<script src="js/admin-guard.js"></script>
+<script>
+(async function(){
+  const list = document.getElementById('resList');
+  const rows = typeof camtravelGetReservations === 'function' ? await camtravelGetReservations() : [];
+  if (!rows.length) { list.innerHTML = '<div class="empty-state">Aucune réservation.</div>'; return; }
+  list.innerHTML = rows.map(r => `
+    <div class="trip-row">
+      <div>
+        <div class="trip-ref">${r.ref || ''}</div>
+        <div class="trip-route">${r.from || ''} → ${r.to || ''}</div>
+        <div class="trip-meta">${r.date || ''} · ${r.passagerNom || ''}</div>
+      </div>
+      <div class="trip-price">${Number(r.total||r.price||0).toLocaleString('fr-FR')} FCFA</div>
+    </div>`).join('');
+})();
+</script>
+<script src="js/chatbot.js"></script>
+</body>
+</html>

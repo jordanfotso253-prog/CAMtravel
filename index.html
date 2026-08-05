@@ -4,10 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CAM travel — Voyagez en toute sérénité</title>
+<meta name="description" content="CAM travel — Réservez vos billets de bus et envoyez vos colis en ligne auprès d'agences partenaires au Cameroun.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="js/theme.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/push-notifications.js"></script>
 </head>
 <body class="home-body">
 
@@ -17,31 +20,69 @@
       <svg class="brand-mark" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="27" fill="#fff"/><path d="M4 28 A24 24 0 0 1 52 28 L52 30 A24 24 0 0 0 4 30 Z" fill="#0b5c3d"/><circle cx="20" cy="20" r="9" fill="#f5921b"/><path d="M10 40 L22 22 L30 34 L36 26 L46 40 Z" fill="#0b5c3d"/><path d="M6 44 Q28 34 50 44 L50 50 Q28 42 6 50 Z" fill="#0b5c3d"/></svg>
       <div class="brand-text">
         <h1><span class="cam">CAM</span> <span class="travel">travel</span></h1>
-        <p>Voyagez en toute sérénité</p>
+        <p data-i18n="brand.tagline">Voyagez en toute sérénité</p>
       </div>
     </a>
     <div class="nav-links">
-      <a href="index.html" class="active">Accueil</a>
-      <a href="recherche.html">Trajets</a>
-      <a href="dashboard.html">Réservations</a>
-      <a href="colis.html">Colis</a>
-      <a href="#about">À propos</a>
-      <a href="#contact">Contact</a>
+      <a href="index.html" class="active" data-i18n="nav.home">Accueil</a>
+      <a href="recherche.html" data-i18n="nav.trips">Trajets</a>
+      <a href="dashboard.html" data-i18n="nav.bookings">Réservations</a>
+      <a href="colis.html" data-i18n="nav.parcels">Colis</a>
+      <a href="location-bus.html">Location bus</a>
+      <a href="#about" data-i18n="nav.about">À propos</a>
+      <a href="#contact" data-i18n="nav.contact">Contact</a>
     </div>
-    <a href="connexion.html" class="btn-nav">Se connecter</a>
+    <div class="nav-actions">
+      <select id="langQuick" class="lang-select" aria-label="Language">
+        <option value="fr">FR</option>
+        <option value="en">EN</option>
+      </select>
+      <a href="connexion.html" class="btn-nav" data-i18n="nav.login">Se connecter</a>
+    </div>
     <button class="nav-toggle" aria-label="Menu">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero-home">
-    <img class="hero-bg" src="https://images.pexels.com/photos/15670/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1600" alt="Bus CAM travel sur une route de montagne">
-    <div class="hero-scrim"></div>
-    <div class="hero-home-content">
-      <h2>Voyagez en toute sérénité avec <span class="accent">CAM travel</span></h2>
-      <p>Réservez vos billets de bus en ligne en toute simplicité et sécurité.</p>
-      <a href="recherche.html" class="btn-hero">Réserver maintenant</a>
+  <!-- HERO with animated multi-photo background -->
+  <section class="hero-home hero-cinematic">
+    <div class="hero-slideshow" aria-hidden="true">
+      <div class="hero-slide is-active" style="background-image:url('https://images.pexels.com/photos/1178448/pexels-photo-1178448.jpeg?auto=compress&cs=tinysrgb&w=1600')"></div>
+      <div class="hero-slide" style="background-image:url('https://images.pexels.com/photos/385998/pexels-photo-385998.jpeg?auto=compress&cs=tinysrgb&w=1600')"></div>
+      <div class="hero-slide" style="background-image:url('https://images.pexels.com/photos/1365486/pexels-photo-1365486.jpeg?auto=compress&cs=tinysrgb&w=1600')"></div>
+      <div class="hero-slide" style="background-image:url('https://images.pexels.com/photos/4606331/pexels-photo-4606331.jpeg?auto=compress&cs=tinysrgb&w=1600')"></div>
+      <div class="hero-slide" style="background-image:url('https://images.pexels.com/photos/15670/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1600')"></div>
+    </div>
+    <div class="hero-scrim hero-scrim-animated"></div>
+    <div class="hero-particles" aria-hidden="true"></div>
+    <div class="hero-home-content anim-fade-up">
+      <p class="hero-badge"><span class="gps-live-dot"></span> Cameroun · Bus &amp; Colis</p>
+      <h2><span data-i18n="home.hero.title">Voyagez en toute sérénité avec</span> <span class="accent">CAM travel</span></h2>
+      <p data-i18n="home.hero.subtitle">Réservez vos billets de bus et envoyez vos colis en ligne, auprès d’agences partenaires de confiance partout au Cameroun.</p>
+      <div class="hero-cta-row">
+        <a href="recherche.html" class="btn-hero" data-i18n="home.hero.cta">Réserver maintenant</a>
+        <a href="location-bus.html" class="btn-hero-outline">Louer un bus</a>
+        <a href="colis.html" class="btn-hero-outline" data-i18n="home.hero.cta2">Envoyer un colis</a>
+      </div>
+      <div class="hero-trust">
+        <span>🚌 Agences partenaires</span>
+        <span>🔒 Paiement sécurisé</span>
+        <span>📍 Suivi GPS</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHOTO STRIP -->
+  <section class="photo-strip" aria-label="Ambiance CAM travel">
+    <div class="photo-strip-track">
+      <figure class="photo-strip-item"><img src="https://images.pexels.com/photos/1178448/pexels-photo-1178448.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Bus sur la route"><figcaption>Bus interurbain</figcaption></figure>
+      <figure class="photo-strip-item"><img src="https://images.pexels.com/photos/385998/pexels-photo-385998.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Route de campagne"><figcaption>Routes du Cameroun</figcaption></figure>
+      <figure class="photo-strip-item"><img src="https://images.pexels.com/photos/1365486/pexels-photo-1365486.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Voyageurs"><figcaption>Voyageurs</figcaption></figure>
+      <figure class="photo-strip-item"><img src="https://images.pexels.com/photos/4606331/pexels-photo-4606331.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Paysage"><figcaption>Paysages</figcaption></figure>
+      <figure class="photo-strip-item"><img src="https://images.pexels.com/photos/2199293/pexels-photo-2199293.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Gare"><figcaption>Départs &amp; gares</figcaption></figure>
+      <figure class="photo-strip-item"><img src="https://images.pexels.com/photos/1178448/pexels-photo-1178448.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Bus"><figcaption>Confort VIP</figcaption></figure>
+      <figure class="photo-strip-item"><img src="https://images.pexels.com/photos/385998/pexels-photo-385998.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Route"><figcaption>Lignes nationales</figcaption></figure>
+      <figure class="photo-strip-item"><img src="https://images.pexels.com/photos/1365486/pexels-photo-1365486.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Voyage"><figcaption>En toute sérénité</figcaption></figure>
     </div>
   </section>
 
@@ -52,8 +93,8 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M21 3l-9 9"/><path d="M15 3h6v6"/></svg>
       </div>
       <div>
-        <h4>Trajets multiples</h4>
-        <p>Plusieurs destinations</p>
+        <h4 data-i18n="home.stat.routes">Trajets multiples</h4>
+        <p data-i18n="home.stat.routes.sub">Destinations nationales</p>
       </div>
     </div>
     <div class="stat-item">
@@ -61,8 +102,8 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       </div>
       <div>
-        <h4>Réservation facile</h4>
-        <p>En quelques clics</p>
+        <h4 data-i18n="home.stat.easy">Réservation facile</h4>
+        <p data-i18n="home.stat.easy.sub">En quelques clics</p>
       </div>
     </div>
     <div class="stat-item">
@@ -70,8 +111,8 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/></svg>
       </div>
       <div>
-        <h4>Paiement sécurisé</h4>
-        <p>100% sécurisé</p>
+        <h4 data-i18n="home.stat.pay">Paiement sécurisé</h4>
+        <p data-i18n="home.stat.pay.sub">Mobile Money & carte</p>
       </div>
     </div>
     <div class="stat-item">
@@ -79,15 +120,143 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
       </div>
       <div>
-        <h4>Support 24/7</h4>
-        <p>Nous sommes là</p>
+        <h4 data-i18n="home.stat.support">Support 24/7</h4>
+        <p data-i18n="home.stat.support.sub">Nous sommes là pour vous</p>
       </div>
     </div>
   </section>
 
+  <!-- HOW IT WORKS -->
+  <section class="home-section" id="how">
+    <div class="home-section-inner">
+      <div class="section-head">
+        <h2 data-i18n="home.how.title">Comment ça marche</h2>
+        <p data-i18n="home.how.sub">Un parcours simple, du départ à l’arrivée.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h3 data-i18n="home.how.1.title">Recherchez</h3>
+          <p data-i18n="home.how.1.text">Choisissez départ, arrivée et date parmi les trajets des agences partenaires.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h3 data-i18n="home.how.2.title">Sélectionnez</h3>
+          <p data-i18n="home.how.2.text">Comparez horaires, prix et confort, puis choisissez vos sièges.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h3 data-i18n="home.how.3.title">Payez</h3>
+          <p data-i18n="home.how.3.text">Réglez en Mobile Money, carte bancaire ou à bord selon l’offre.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <h3 data-i18n="home.how.4.title">Voyagez</h3>
+          <p data-i18n="home.how.4.text">Recevez votre billet électronique avec QR code et présentez-le à l’embarquement.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POPULAR ROUTES -->
+  <section class="home-section home-section-alt" id="routes">
+    <div class="home-section-inner">
+      <div class="section-head">
+        <h2 data-i18n="home.routes.title">Destinations populaires</h2>
+        <p data-i18n="home.routes.sub">Les axes les plus demandés sur CAM travel.</p>
+      </div>
+      <div class="routes-grid">
+        <a class="route-card" href="recherche.html">
+          <div class="route-cities"><span>Yaoundé</span><span class="route-arrow">→</span><span>Douala</span></div>
+          <div class="route-meta">~2h30 · VIP · Climatisé</div>
+          <span class="route-link" data-i18n="home.routes.book">Voir les trajets</span>
+        </a>
+        <a class="route-card" href="recherche.html">
+          <div class="route-cities"><span>Douala</span><span class="route-arrow">→</span><span>Bafoussam</span></div>
+          <div class="route-meta">~4h00 · Climatisé</div>
+          <span class="route-link" data-i18n="home.routes.book">Voir les trajets</span>
+        </a>
+        <a class="route-card" href="recherche.html">
+          <div class="route-cities"><span>Bertoua</span><span class="route-arrow">→</span><span>Yaoundé</span></div>
+          <div class="route-meta">~5h00 · Climatisé</div>
+          <span class="route-link" data-i18n="home.routes.book">Voir les trajets</span>
+        </a>
+        <a class="route-card" href="recherche.html">
+          <div class="route-cities"><span>Yaoundé</span><span class="route-arrow">→</span><span>Garoua</span></div>
+          <div class="route-meta">~12h · VIP</div>
+          <span class="route-link" data-i18n="home.routes.book">Voir les trajets</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="home-section" id="about">
+    <div class="home-section-inner about-grid">
+      <div>
+        <div class="section-head" style="text-align:left; margin-bottom:18px;">
+          <h2 data-i18n="home.about.title">À propos de CAM travel</h2>
+        </div>
+        <p class="about-lead" data-i18n="home.about.text">CAM travel est une plateforme camerounaise qui met en relation voyageurs et agences de transport partenaires. Nous facilitons la réservation de billets de bus et l’envoi de colis, avec un suivi clair et un support réactif.</p>
+        <ul class="about-list">
+          <li data-i18n="home.about.point1">Plusieurs agences partenaires vérifiées</li>
+          <li data-i18n="home.about.point2">Billets électroniques avec QR code</li>
+          <li data-i18n="home.about.point3">Remboursements et suivi des trajets</li>
+          <li data-i18n="home.about.point4">Données protégées (comptes sécurisés)</li>
+        </ul>
+      </div>
+      <div class="about-panel">
+        <div class="about-stat"><strong>5+</strong><span>Agences</span></div>
+        <div class="about-stat"><strong>10+</strong><span>Trajets</span></div>
+        <div class="about-stat"><strong>24/7</strong><span>Support</span></div>
+        <div class="about-stat"><strong>100%</strong><span>En ligne</span></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- THREE PORTALS -->
+  <section class="home-section home-section-alt" id="portals">
+    <div class="home-section-inner">
+      <div class="section-head">
+        <h2>Trois espaces, un même système</h2>
+        <p>Client, administrateur et agence partenaire — chacun son tableau de bord, ses couleurs et ses outils.</p>
+      </div>
+      <div class="portal-grid">
+        <a class="portal-card client anim-fade-up" href="connexion.html">
+          <span class="role-badge client">Client</span>
+          <h3>Espace voyageur</h3>
+          <p>Recherchez un trajet, réservez vos sièges, payez en ligne, suivez votre bus en GPS et gérez vos remboursements.</p>
+          <span class="portal-cta">Se connecter →</span>
+        </a>
+        <a class="portal-card agency anim-fade-up" href="connexion.html">
+          <span class="role-badge agency">Agence</span>
+          <h3>Espace agence</h3>
+          <p>Publiez vos trajets, suivez les réservations sur vos lignes, gérez le remplissage et vérifiez les tickets à l’embarquement.</p>
+          <span class="portal-cta">Accès agence →</span>
+        </a>
+        <a class="portal-card admin anim-fade-up" href="connexion.html">
+          <span class="role-badge admin">Admin</span>
+          <h3>Espace administrateur</h3>
+          <p>Pilotez les agences, commissions, utilisateurs, véhicules, conducteurs et demandes de remboursement.</p>
+          <span class="portal-cta">Accès admin →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BAND -->
+  <section class="home-cta-band">
+    <div class="home-section-inner" style="text-align:center;">
+      <h2 data-i18n="home.cta.title">Prêt à partir ?</h2>
+      <p data-i18n="home.cta.text">Réservez votre prochain trajet en quelques minutes.</p>
+      <a href="recherche.html" class="btn-hero" data-i18n="home.cta.btn">Rechercher un trajet</a>
+    </div>
+  </section>
+
   <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="footer-manager">Gérant : <strong>FOTSO-JORDAN</strong></div>
+  <footer class="site-footer" id="contact">
+    <div class="footer-manager"><span data-i18n="footer.manager">Gérant</span> : <strong>FOTSO-JORDAN</strong></div>
     <div class="footer-contacts">
       <a href="tel:696745324">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -99,12 +268,46 @@
       </a>
     </div>
     <div class="footer-contacts">
-      <a href="privacy.html">Politique de confidentialité</a>
-      <a href="terms.html">Conditions d'utilisation</a>
+      <a href="privacy.html" data-i18n="footer.privacy">Politique de confidentialité</a>
+      <a href="terms.html" data-i18n="footer.terms">Conditions d'utilisation</a>
     </div>
   </footer>
 
 <script src="js/nav-toggle.js"></script>
 <script src="js/chatbot.js"></script>
+<script>
+  (function () {
+    const sel = document.getElementById('langQuick');
+    if (!sel) return;
+    sel.value = typeof camtravelGetLang === 'function' ? camtravelGetLang() : 'fr';
+    sel.addEventListener('change', () => {
+      if (typeof camtravelSetLang === 'function') camtravelSetLang(sel.value);
+    });
+  })();
+</script>
+
+<script>
+(function heroSlideInit(){
+  const slides = document.querySelectorAll('.hero-slide');
+  if (!slides.length) return;
+  let i = 0;
+  setInterval(() => {
+    slides[i].classList.remove('is-active');
+    i = (i + 1) % slides.length;
+    slides[i].classList.add('is-active');
+  }, 5000);
+  // particles
+  const host = document.querySelector('.hero-particles');
+  if (host) {
+    for (let n = 0; n < 18; n++) {
+      const s = document.createElement('span');
+      s.style.left = (Math.random()*100) + '%';
+      s.style.animationDelay = (Math.random()*6) + 's';
+      s.style.animationDuration = (6 + Math.random()*8) + 's';
+      host.appendChild(s);
+    }
+  }
+})();
+</script>
 </body>
 </html>

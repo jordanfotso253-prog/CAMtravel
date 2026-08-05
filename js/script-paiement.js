@@ -61,6 +61,25 @@ form.addEventListener('submit', async (e) => {
     });
   }
 
+  if (typeof camtravelNotify !== 'undefined') {
+    try {
+      await camtravelNotify.bookingConfirmed(ref, from, to);
+      await camtravelNotify.adminNewBooking(ref, from, to);
+      await camtravelNotify.agencyNewBooking(ref, from, to);
+    } catch (e) {}
+  }
+
+  if (typeof camtravelEmail !== 'undefined') {
+    try {
+      await camtravelEmail.sendBooking({
+        ref, from, to, date, dep, total,
+        name: passagerNom, email: null
+      });
+    } catch (e) {}
+  } else if (typeof camtravelPush !== 'undefined' && camtravelPush.notifyBookingConfirmed) {
+    try { await camtravelPush.notifyBookingConfirmed(ref, from, to); } catch (e) {}
+  }
+
   const next = new URLSearchParams(params);
   next.set('ref', ref);
   next.set('total', total);

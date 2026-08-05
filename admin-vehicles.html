@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAM travel — Véhicules</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme.js"></script>
+<script src="js/i18n.js"></script>
+</head>
+<body class="role-admin">
+<div class="dash-layout">
+  <aside class="sidebar">
+    <a href="admin-dashboard.html" class="brand">
+      <svg class="brand-mark" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="27" fill="#fff"/><path d="M4 28 A24 24 0 0 1 52 28 L52 30 A24 24 0 0 0 4 30 Z" fill="#0b5c3d"/><circle cx="20" cy="20" r="9" fill="#f5921b"/><path d="M10 40 L22 22 L30 34 L36 26 L46 40 Z" fill="#0b5c3d"/><path d="M6 44 Q28 34 50 44 L50 50 Q28 42 6 50 Z" fill="#0b5c3d"/></svg>
+      <div class="brand-text"><h1><span class="cam">CAM</span> <span class="travel">travel</span></h1></div>
+    </a>
+    <nav class="sidebar-nav">
+      <a href="admin-dashboard.html">Tableau de bord</a>
+      <a href="verify-ticket.html">Vérifier un ticket</a>
+      <a href="admin-users.html">Utilisateurs</a>
+      <a href="agencies.html">Agences</a>
+      <a href="commissions.html">Commissions</a>
+      <a href="admin-reservations.html">Réservations</a>
+      <a href="admin-vehicles.html" class="active">Véhicules</a>
+      <a href="admin-drivers.html">Conducteurs</a>
+      <a href="admin-parametres.html">Paramètres</a>
+    </nav>
+    <div class="sidebar-footer">
+      <nav class="sidebar-nav">
+        <a href="index.html" onclick="camtravelLogout(event)">Déconnexion</a>
+      </nav>
+    </div>
+  </aside>
+  <main class="dash-main anim-fade-up">
+    <div class="dash-role-strip">
+      <h2 style="margin:0;">Véhicules</h2>
+      <span class="role-badge admin">Espace admin</span>
+    </div>
+    <div class="status-banner" id="statusBanner"></div>
+    <div class="profile-card" style="margin-bottom:16px;">
+      <h3 style="margin-top:0;">Ajouter un véhicule</h3>
+      <form id="vehForm" class="row" style="flex-wrap:wrap; gap:12px;">
+        <div class="field" style="flex:1;min-width:140px;"><label>Immatriculation</label><input id="vPlate" required placeholder="LT 1234 CE" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;"></div>
+        <div class="field" style="flex:1;min-width:140px;"><label>Modèle</label><input id="vModel" required placeholder="Mercedes Sprinter" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;"></div>
+        <div class="field" style="flex:1;min-width:100px;"><label>Places</label><input id="vSeats" type="number" value="40" min="10" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;"></div>
+        <div class="field" style="align-self:flex-end;"><button class="btn-primary" type="submit" style="width:auto;padding:11px 18px;">Ajouter</button></div>
+      </form>
+    </div>
+    <div class="profile-card"><div id="vehList"></div></div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/data-store.js"></script>
+<script src="js/admin-guard.js"></script>
+<script>
+const KEY='camtravel_vehicles';
+function load(){ try{return JSON.parse(localStorage.getItem(KEY))||[];}catch(e){return[];} }
+function save(a){ localStorage.setItem(KEY, JSON.stringify(a)); }
+function render(){
+  const list=document.getElementById('vehList');
+  const rows=load();
+  list.innerHTML = rows.length? rows.map((v,i)=>`
+    <div class="trip-row">
+      <div><div class="trip-ref">${v.plate}</div><div class="trip-route">${v.model}</div><div class="trip-meta">${v.seats} places</div></div>
+      <button type="button" class="btn-secondary" data-i="${i}" style="width:auto;padding:8px 12px;">Retirer</button>
+    </div>`).join('') : '<div class="empty-state">Aucun véhicule. Ajoutez-en un.</div>';
+  list.querySelectorAll('[data-i]').forEach(btn=>{
+    btn.onclick=()=>{ const a=load(); a.splice(+btn.dataset.i,1); save(a); render(); };
+  });
+}
+document.getElementById('vehForm').onsubmit=(e)=>{
+  e.preventDefault();
+  const a=load();
+  a.unshift({plate:vPlate.value.trim(), model:vModel.value.trim(), seats:+vSeats.value||40});
+  save(a); e.target.reset(); vSeats.value=40; render();
+  const b=document.getElementById('statusBanner');
+  b.className='status-banner show success'; b.textContent='Véhicule ajouté.';
+  setTimeout(()=>b.classList.remove('show'),1500);
+};
+render();
+</script>
+<script src="js/chatbot.js"></script>
+</body>
+</html>

@@ -8,8 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="js/theme.js"></script>
+<script src="js/i18n.js"></script>
 </head>
-<body>
+<body class="role-client">
 <div class="dash-layout">
   <aside class="sidebar">
     <a href="dashboard.html" class="brand">
@@ -70,17 +71,22 @@
 
   <main class="dash-main">
     <div class="page-header-row">
-      <h2>Notifications</h2>
+      <div class="page-header-row" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><h2 style="margin:0">Notifications</h2>
     </div>
 
     <div class="panel">
-      <div id="notifFullList"></div>
+      <div style="margin-bottom:12px;"><button type="button" class="btn-secondary" id="notifClearBtn" style="width:auto;padding:8px 14px;">Tout effacer</button></div>
+      <div id="notifFullList" data-ready="1"></div>
     </div>
   </main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/data-store.js"></script>
+<script src="js/notifications-store.js"></script>
+<script src="js/email-notifications.js"></script>
+<script src="js/email-config.js"></script>
+<script src="js/push-notifications.js"></script>
 <script src="js/auth-guard.js"></script>
 <script src="js/script-notifications.js"></script>
 <script src="js/chatbot.js"></script>

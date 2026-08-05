@@ -72,33 +72,3 @@ fonctionnalités marchent avec votre projet Supabase existant : **SQL
 Editor → New query → recollez tout le contenu de `supabase-schema.sql`
 → Run.** Le fichier est conçu pour être ré-exécuté sans danger : il ne
 fait qu'ajouter ce qui manque, aucune donnée existante n'est touchée.
-
-## Mise à jour : association directe agence + sync hors ligne
-
-Colonnes ajoutées sur `reservations` :
-
-| Colonne | Rôle |
-|---------|------|
-| `source` | `'web'` (défaut) ou `'agency'` (vente guichet) |
-| `sold_by_agency_id` | Agence qui a encaissé la vente |
-| `client_local_id` | Id généré hors ligne (anti-doublon à la sync) |
-| `synced_at` | Moment où la vente est arrivée dans Supabase |
-
-Fonction RPC : `camtravel_sync_agency_reservation(...)` — à appeler
-depuis le poste d'agence quand Internet revient. Idempotente (même
-`client_local_id` = une seule ligne).
-
-**Action requise** si votre projet Supabase existe déjà : SQL Editor →
-New query → coller tout `supabase-schema.sql` → **Run**.
-
-
-## Mise à jour : quota guichet + vente hors ligne
-
-Colonne `trips.agency_quota` (défaut 10) : sièges réservés à la vente
-au comptoir, non proposés en ligne.
-
-Exemple : 40 places, quota 10 → le web voit les sièges **1–30** ;
-l'agence peut vendre **1–40** (dont 31–40 réservés guichet).
-
-Re-exécutez `supabase-schema.sql` dans le SQL Editor pour ajouter
-la colonne si votre projet existe déjà.

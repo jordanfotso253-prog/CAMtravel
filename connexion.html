@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="js/theme.js"></script>
+<script src="js/i18n.js"></script>
 </head>
 <body>
 <div class="page">
@@ -84,7 +85,7 @@
         <div class="field" id="f-pass">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <label for="pass" style="margin-bottom:0;">Mot de passe</label>
-            <a href="#" style="font-size:12.5px; color:var(--green-deep); font-weight:600; text-decoration:none;">Mot de passe oublié ?</a>
+            <a href="#" id="forgotPwdLink" style="font-size:12.5px; color:var(--green-deep); font-weight:600; text-decoration:none;">Mot de passe oublié ?</a>
           </div>
           <div class="input-wrap" style="margin-top:7px;">
             <svg class="leading" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -103,6 +104,10 @@
 
         <button type="submit" class="btn-primary" id="submitBtn">Se connecter</button>
       </form>
+    <p style="margin-top:16px;font-size:12.5px;color:var(--gray-text);line-height:1.5;">
+      <strong>Espace agence (démo)</strong> — ex. <code>admin@amourvoyage.com</code> / <code>agence123</code><br>
+      Une seule base CAM travel : chaque agence ne voit que ses données (<code>agency_id</code>).
+    </p>
 
       <div class="divider">ou se connecter avec</div>
 
@@ -125,5 +130,13 @@
 <script src="js/data-store.js"></script>
 <script src="js/script-login.js"></script>
 <script src="js/chatbot.js"></script>
+<script>
+document.getElementById('forgotPwdLink')?.addEventListener('click', function(e){
+  e.preventDefault();
+  alert(typeof camtravelGetLang === 'function' && camtravelGetLang() === 'en'
+    ? 'Password reset: contact support at 696 74 53 24 or use Supabase Auth reset email when configured.'
+    : 'Réinitialisation : contactez le support au 696 74 53 24, ou utilisez la réinitialisation email Supabase une fois configurée.');
+});
+</script>
 </body>
 </html>

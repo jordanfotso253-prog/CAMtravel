@@ -48,10 +48,11 @@ function renderTrips(trips) {
       <div class="price">${Number(trip.price).toLocaleString('fr-FR')} FCFA</div>
       <a class="btn-choisir" href="detail-trajet.html?${new URLSearchParams({
         tripId: trip.id, company: trip.company, dep: trip.dep, arr: trip.arr,
-        duration: trip.duration || '', price: trip.price, tags: trip.tags.join(','),
-        seatCount: trip.seatCount,
-        agencyQuota: trip.agencyQuota != null ? trip.agencyQuota : 10,
-        from, to, date
+        duration: trip.duration || '', price: trip.price, tags: (trip.tags || []).join(','),
+        seatCount: trip.seatCount, from, to, date,
+        vehicleId: trip.vehicleId || '', busName: trip.busName || '',
+        matricule: trip.matricule || '', layoutId: trip.layoutId || '',
+        vip: trip.vip ? '1' : (trip.tags && trip.tags.some(x => /VIP/i.test(x)) ? '1' : '0')
       }).toString()}">Choisir</a>
     `;
 
@@ -61,6 +62,17 @@ function renderTrips(trips) {
 
 (async function init() {
   list.innerHTML = `<div class="empty-state">Recherche des trajets…</div>`;
-  const trips = typeof camtravelGetTrips === 'function' ? await camtravelGetTrips({ from, to }) : [];
+  let trips = [];
+  if (typeof camtravelBusApi !== 'undefined' && camtravelBusApi.searchTrips) {
+    trips = await camtravelBusApi.searchTrips({ from, to, date });
+  } else if (typeof camtravelGetTrips === 'function') {
+    trips = await camtravelGetTrips({ from, to });
+  }
+  // Garantir tags tableau pour le rendu
+  trips = (trips || []).map(tr => ({
+    ...tr,
+    tags: Array.isArray(tr.tags) ? tr.tags : String(tr.tags || '').split(',').map(s => s.trim()).filter(Boolean),
+    company: tr.company || 'Agence partenaire'
+  }));
   renderTrips(trips);
 })();

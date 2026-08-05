@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAM travel — Locations (Agence)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/theme.js"></script>
+<script src="js/i18n.js"></script>
+</head>
+<body class="role-agency">
+<div class="dash-layout">
+  <aside class="sidebar">
+    <a href="agency-dashboard.html" class="brand">
+      <svg class="brand-mark" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="27" fill="#fff"/><path d="M4 28 A24 24 0 0 1 52 28 L52 30 A24 24 0 0 0 4 30 Z" fill="#0b5c3d"/><circle cx="20" cy="20" r="9" fill="#f5921b"/><path d="M10 40 L22 22 L30 34 L36 26 L46 40 Z" fill="#0b5c3d"/><path d="M6 44 Q28 34 50 44 L50 50 Q28 42 6 50 Z" fill="#0b5c3d"/></svg>
+      <div class="brand-text"><h1><span class="cam">CAM</span> <span class="travel">travel</span></h1></div>
+    </a>
+    <nav class="sidebar-nav">
+      <a href="agency-dashboard.html">Tableau de bord</a>
+      <a href="agency-dashboard.html#trips">Mes trajets</a>
+      <a href="agency-vehicles.html">Mes bus</a>
+      <a href="agency-rentals.html" class="active">Locations</a>
+      <a href="agency-staff.html">Équipe</a>
+      <a href="agency-parametres.html">Paramètres</a>
+      <a href="index.html">← Accueil</a>
+    </nav>
+  </aside>
+  <main class="dash-main">
+    <div class="dash-top">
+      <div>
+        <h2 style="margin:0;">Demandes de location</h2>
+        <p style="margin:4px 0 0;color:var(--gray-text);font-size:13px;">Événements clients — confirmez ou refusez les demandes</p>
+      </div>
+    </div>
+    <div class="status-banner" id="statusBanner"></div>
+    <div class="stat-cards" style="margin-bottom:18px;">
+      <div class="stat-card"><div><p class="label">En attente</p><p class="value" id="stPending">0</p></div></div>
+      <div class="stat-card"><div><p class="label">Confirmées</p><p class="value" id="stOk">0</p></div></div>
+      <div class="stat-card"><div><p class="label">Total demandes</p><p class="value" id="stAll">0</p></div></div>
+    </div>
+    <div class="profile-card">
+      <div id="rentalList"></div>
+    </div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/data-store.js"></script>
+<script src="js/rental-store.js"></script>
+<script src="js/agency-guard.js"></script>
+<script>
+(function(){
+  const banner=document.getElementById('statusBanner');
+  function show(m,ok){banner.className='status-banner show '+(ok?'success':'error');banner.textContent=m;setTimeout(()=>banner.classList.remove('show'),2500);}
+  const labels={requested:'En attente',quoted:'Devis envoyé',confirmed:'Confirmée',rejected:'Refusée',done:'Terminée'};
+  function render(){
+    const items=camtravelRentals.list();
+    stPending.textContent=items.filter(r=>r.status==='requested').length;
+    stOk.textContent=items.filter(r=>r.status==='confirmed').length;
+    stAll.textContent=items.length;
+    rentalList.innerHTML=items.length?items.map(r=>`
+      <div class="admin-trip-row">
+        <div>
+          <div class="trip-ref">${r.id} <span class="status-pill ${r.status==='confirmed'?'upcoming':r.status==='rejected'?'past':''}">${labels[r.status]||r.status}</span></div>
+          <div class="trip-route">${r.eventLabel} · ${r.from} → ${r.to}</div>
+          <div class="trip-meta">${r.clientName} · ${r.clientTel}${r.clientEmail?' · '+r.clientEmail:''}</div>
+          <div class="trip-meta">${r.busLabel} × ${r.busCount} · ${r.passengers||'?'} passagers · ${r.dateStart}${r.dateEnd&&r.dateEnd!==r.dateStart?' → '+r.dateEnd:''}</div>
+          <div class="trip-meta">Estimation : <strong>${Number(r.quote).toLocaleString('fr-FR')} FCFA</strong>${r.notes?' · '+r.notes:''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          ${r.status==='requested'?`
+            <button type="button" class="btn-primary" data-s="confirmed" data-id="${r.id}" style="width:auto;padding:8px 12px;">Confirmer</button>
+            <button type="button" class="btn-secondary" data-s="rejected" data-id="${r.id}" style="width:auto;padding:8px 12px;">Refuser</button>
+          `:r.status==='confirmed'?`
+            <button type="button" class="btn-secondary" data-s="done" data-id="${r.id}" style="width:auto;padding:8px 12px;">Marquer terminé</button>
+          `:''}
+        </div>
+      </div>
+    `).join(''):'<div class="empty-state">Aucune demande de location pour le moment.</div>';
+    rentalList.querySelectorAll('[data-s]').forEach(btn=>{
+      btn.onclick=()=>{
+        camtravelRentals.setStatus(btn.dataset.id, btn.dataset.s);
+        show(btn.dataset.s==='confirmed'?'Location confirmée.':btn.dataset.s==='rejected'?'Demande refusée.':'Mis à jour.', true);
+        render();
+      };
+    });
+  }
+  render();
+})();
+</script>
+</body>
+</html>

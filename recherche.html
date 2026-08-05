@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="js/theme.js"></script>
+<script src="js/i18n.js"></script>
 </head>
 <body>
 
@@ -58,7 +59,7 @@
             <label for="depart">Départ</label>
             <div class="input-wrap">
               <svg class="leading" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-              <select id="depart" style="width:100%; padding:12px 14px 12px 42px; border:1.5px solid var(--border); border-radius:9px; font-size:14px; font-family:'Inter',sans-serif; color:var(--ink); background:#fff; appearance:none;">
+              <select id="depart" data-cities style="width:100%; padding:12px 14px 12px 42px; border:1.5px solid var(--border); border-radius:9px; font-size:14px; font-family:'Inter',sans-serif; color:var(--ink); background:#fff; appearance:none;">
                 <option value="">Choisir une ville</option>
                 <option>Yaoundé</option>
                 <option>Douala</option>
@@ -73,7 +74,7 @@
             <label for="arrivee">Arrivée</label>
             <div class="input-wrap">
               <svg class="leading" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-              <select id="arrivee" style="width:100%; padding:12px 14px 12px 42px; border:1.5px solid var(--border); border-radius:9px; font-size:14px; font-family:'Inter',sans-serif; color:var(--ink); background:#fff; appearance:none;">
+              <select id="arrivee" data-cities style="width:100%; padding:12px 14px 12px 42px; border:1.5px solid var(--border); border-radius:9px; font-size:14px; font-family:'Inter',sans-serif; color:var(--ink); background:#fff; appearance:none;">
                 <option value="">Choisir une ville</option>
                 <option>Douala</option>
                 <option>Yaoundé</option>
@@ -120,5 +121,9 @@
 <script src="js/nav-toggle.js"></script>
 <script src="js/script-recherche.js"></script>
 <script src="js/chatbot.js"></script>
+<script src="js/cameroon-cities.js"></script>
+<script>document.addEventListener("DOMContentLoaded",()=>{if(window.camtravelCities){camtravelCities.fillSelect(document.getElementById("depart"));camtravelCities.fillSelect(document.getElementById("arrivee"));}});</script>
+<script src="js/bus-api-config.js"></script>
+<script src="js/bus-api.js"></script>
 </body>
 </html>

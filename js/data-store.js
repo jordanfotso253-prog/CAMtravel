@@ -12,9 +12,87 @@ const CAMTRAVEL_USERS_KEY = 'camtravel_users';
 const CAMTRAVEL_RESERVATIONS_KEY = 'camtravel_reservations';
 const CAMTRAVEL_COLIS_KEY = 'camtravel_colis';
 const CAMTRAVEL_LAST_SEEN_KEY = 'camtravel_admin_last_seen';
-// File d'attente des ventes guichet non encore envoyées à Supabase
-// (connexion instable au Cameroun : on vend d'abord en local, on sync plus tard).
-const CAMTRAVEL_PENDING_RESERVATIONS_KEY = 'camtravel_pending_reservations';
+
+// ---------- DONNÉES LOCALES (mode hors-ligne / sans Supabase) ----------
+const CAMTRAVEL_TRIPS_KEY = 'camtravel_trips';
+const CAMTRAVEL_AGENCIES_KEY = 'camtravel_agencies_local';
+const CAMTRAVEL_AGENCY_SESSION = 'camtravel_agency_session';
+const CAMTRAVEL_AGENCY_ACCOUNTS_KEY = 'camtravel_agency_accounts';
+
+
+function camtravelSeedLocalCatalog() {
+  try {
+    const ver = localStorage.getItem('camtravel_catalog_ver');
+    if (ver === '4') return; // catalogue sans agence CAM travel
+    // Invalide l'ancien catalogue (qui pouvait contenir CAM travel comme agence)
+    localStorage.removeItem(CAMTRAVEL_TRIPS_KEY);
+    localStorage.removeItem(CAMTRAVEL_AGENCIES_KEY);
+    localStorage.setItem('camtravel_catalog_ver', '4');
+  } catch (e) {}
+  // (ré)initialise le catalogue
+  const agencies = [
+    { id: 'ag-exp', name: 'Express Voyages', email: 'admin@expressvoyages.cm', tel: '690000001', ville: 'Douala', commission_percent: 10, status: 'active', role: 'agence_admin', created_at: new Date().toISOString() },
+    { id: 'ag-gen', name: 'General Express', email: 'admin@generalexpress.cm', tel: '691000001', ville: 'Yaoundé', commission_percent: 10, status: 'active', role: 'agence_admin', created_at: new Date().toISOString() },
+    { id: 'ag-roy', name: 'Royal Bus', email: 'admin@royalbus.cm', tel: '692000001', ville: 'Douala', commission_percent: 10, status: 'active', role: 'agence_admin', created_at: new Date().toISOString() },
+    { id: 'ag-dre', name: 'Dream Transport', email: 'admin@dreamtransport.cm', tel: '693000001', ville: 'Bertoua', commission_percent: 10, status: 'active', role: 'agence_admin', created_at: new Date().toISOString() },
+    { id: 'ag-amour', name: 'Amour Voyage', email: 'admin@amourvoyage.com', tel: '694000001', ville: 'Yaoundé', commission_percent: 10, status: 'active', role: 'agence_admin', created_at: new Date().toISOString() }
+  ];
+  // Comptes agence (email → agency_id) pour mode local
+  const accounts = agencies.map(a => ({
+    email: a.email,
+    password: 'agence123',
+    role: 'agence_admin',
+    agency_id: a.id,
+    name: a.name
+  }));
+  localStorage.setItem(CAMTRAVEL_AGENCY_ACCOUNTS_KEY, JSON.stringify(accounts));
+
+  const trips = [
+    { id: 't1', agencyId: 'ag-exp', company: 'Express Voyages', from: 'Yaoundé', to: 'Douala', dep: '06:00 AM', arr: '09:00 AM', duration: '3h00m', price: 12000, tags: ['VIP','Climatisé','WiFi'], seatCount: 40, active: true },
+    { id: 't2', agencyId: 'ag-gen', company: 'General Express', from: 'Yaoundé', to: 'Douala', dep: '08:00 AM', arr: '10:30 AM', duration: '2h30m', price: 12500, tags: ['VIP','Climatisé','WiFi'], seatCount: 40, active: true },
+    { id: 't3', agencyId: 'ag-roy', company: 'Royal Bus', from: 'Yaoundé', to: 'Douala', dep: '02:00 PM', arr: '05:00 PM', duration: '3h00m', price: 12000, tags: ['Climatisé'], seatCount: 40, active: true },
+    { id: 't4', agencyId: 'ag-exp', company: 'Express Voyages', from: 'Douala', to: 'Yaoundé', dep: '07:00 AM', arr: '10:00 AM', duration: '3h00m', price: 12500, tags: ['VIP','Climatisé','WiFi'], seatCount: 40, active: true },
+    { id: 't5', agencyId: 'ag-gen', company: 'General Express', from: 'Yaoundé', to: 'Bafoussam', dep: '07:30 AM', arr: '12:00 PM', duration: '4h30m', price: 10000, tags: ['Climatisé'], seatCount: 40, active: true },
+    { id: 't6', agencyId: 'ag-roy', company: 'Royal Bus', from: 'Yaoundé', to: 'Bamenda', dep: '06:30 AM', arr: '01:00 PM', duration: '6h30m', price: 12000, tags: ['Climatisé','WiFi'], seatCount: 40, active: true },
+    { id: 't7', agencyId: 'ag-dre', company: 'Dream Transport', from: 'Yaoundé', to: 'Kribi', dep: '08:00 AM', arr: '12:00 PM', duration: '4h00m', price: 8000, tags: ['Climatisé'], seatCount: 40, active: true },
+    { id: 't8', agencyId: 'ag-exp', company: 'Express Voyages', from: 'Yaoundé', to: 'Douala', dep: '08:00 AM', arr: '11:30 AM', duration: '3h30m', price: 11000, tags: ['VIP','Climatisé'], seatCount: 40, active: true },
+    { id: 't9', agencyId: 'ag-exp', company: 'Express Voyages', from: 'Douala', to: 'Bafoussam', dep: '07:00 AM', arr: '11:00 AM', duration: '4h00m', price: 10000, tags: ['Climatisé'], seatCount: 40, active: true },
+    { id: 't10', agencyId: 'ag-exp', company: 'Express Voyages', from: 'Douala', to: 'Bamenda', dep: '06:00 AM', arr: '12:30 PM', duration: '6h30m', price: 11000, tags: ['Climatisé','WiFi'], seatCount: 40, active: true },
+    { id: 't11', agencyId: 'ag-exp', company: 'Express Voyages', from: 'Douala', to: 'Limbé', dep: '09:00 AM', arr: '10:30 AM', duration: '1h30m', price: 2500, tags: ['Climatisé'], seatCount: 40, active: true },
+    { id: 't12', agencyId: 'ag-exp', company: 'Express Voyages', from: 'Douala', to: 'Buea', dep: '10:00 AM', arr: '11:30 AM', duration: '1h30m', price: 3000, tags: ['Climatisé'], seatCount: 40, active: true },
+    { id: 't13', agencyId: 'ag-gen', company: 'General Express', from: 'Yaoundé', to: 'Douala', dep: '10:00 AM', arr: '12:30 PM', duration: '2h30m', price: 13000, tags: ['VIP','Climatisé','WiFi'], seatCount: 40, active: true },
+    { id: 't14', agencyId: 'ag-gen', company: 'General Express', from: 'Yaoundé', to: 'Garoua', dep: '06:00 AM', arr: '06:00 PM', duration: '12h00m', price: 25000, tags: ['VIP','Climatisé'], seatCount: 40, active: true },
+    { id: 't15', agencyId: 'ag-gen', company: 'General Express', from: 'Yaoundé', to: 'Ngaoundéré', dep: '05:30 AM', arr: '04:00 PM', duration: '10h30m', price: 20000, tags: ['Climatisé'], seatCount: 40, active: true },
+    { id: 't16', agencyId: 'ag-gen', company: 'General Express', from: 'Yaoundé', to: 'Maroua', dep: '05:00 AM', arr: '08:00 PM', duration: '15h00m', price: 30000, tags: ['VIP','Climatisé'], seatCount: 40, active: true },
+    { id: 't17', agencyId: 'ag-roy', company: 'Royal Bus', from: 'Yaoundé', to: 'Douala', dep: '11:00 AM', arr: '01:30 PM', duration: '2h30m', price: 12000, tags: ['Climatisé','WiFi'], seatCount: 40, active: true },
+    { id: 't18', agencyId: 'ag-roy', company: 'Royal Bus', from: 'Douala', to: 'Bafoussam', dep: '07:00 AM', arr: '11:00 AM', duration: '4h00m', price: 10000, tags: ['Climatisé','WiFi'], seatCount: 40, active: true },
+    { id: 't19', agencyId: 'ag-roy', company: 'Royal Bus', from: 'Douala', to: 'Nkongsamba', dep: '08:00 AM', arr: '10:00 AM', duration: '2h00m', price: 4000, tags: ['Climatisé'], seatCount: 40, active: true },
+    { id: 't20', agencyId: 'ag-roy', company: 'Royal Bus', from: 'Bafoussam', to: 'Bamenda', dep: '09:00 AM', arr: '11:00 AM', duration: '2h00m', price: 3500, tags: ['Climatisé'], seatCount: 40, active: true },
+    { id: 't21', agencyId: 'ag-dre', company: 'Dream Transport', from: 'Yaoundé', to: 'Douala', dep: '01:00 PM', arr: '03:30 PM', duration: '2h30m', price: 11500, tags: ['VIP','Climatisé'], seatCount: 40, active: true },
+    { id: 't22', agencyId: 'ag-dre', company: 'Dream Transport', from: 'Bertoua', to: 'Yaoundé', dep: '09:00 AM', arr: '02:00 PM', duration: '5h00m', price: 15000, tags: ['Climatisé'], seatCount: 40, active: true },
+    { id: 't23', agencyId: 'ag-dre', company: 'Dream Transport', from: 'Yaoundé', to: 'Bertoua', dep: '08:00 AM', arr: '01:00 PM', duration: '5h00m', price: 15000, tags: ['Climatisé'], seatCount: 40, active: true },
+    { id: 't24', agencyId: 'ag-dre', company: 'Dream Transport', from: 'Yaoundé', to: 'Ebolowa', dep: '07:00 AM', arr: '10:00 AM', duration: '3h00m', price: 5000, tags: ['Climatisé'], seatCount: 40, active: true },
+    { id: 't25', agencyId: 'ag-gen', company: 'General Express', from: 'Garoua', to: 'Maroua', dep: '08:00 AM', arr: '11:00 AM', duration: '3h00m', price: 5000, tags: ['Climatisé'], seatCount: 40, active: true },
+    { id: 't26', agencyId: 'ag-roy', company: 'Royal Bus', from: 'Ngaoundéré', to: 'Garoua', dep: '07:00 AM', arr: '12:00 PM', duration: '5h00m', price: 8000, tags: ['Climatisé'], seatCount: 40, active: true },
+    { id: 't27', agencyId: 'ag-exp', company: 'Express Voyages', from: 'Douala', to: 'Kribi', dep: '08:30 AM', arr: '11:00 AM', duration: '2h30m', price: 5000, tags: ['Climatisé','WiFi'], seatCount: 40, active: true },
+    { id: 't28', agencyId: 'ag-gen', company: 'General Express', from: 'Yaoundé', to: 'Bafoussam', dep: '09:00 AM', arr: '01:30 PM', duration: '4h30m', price: 9500, tags: ['Climatisé'], seatCount: 40, active: true }
+  ];
+  localStorage.setItem(CAMTRAVEL_AGENCIES_KEY, JSON.stringify(agencies));
+  localStorage.setItem(CAMTRAVEL_TRIPS_KEY, JSON.stringify(trips));
+}
+
+function camtravelLocalGetTrips() {
+  camtravelSeedLocalCatalog();
+  try { return JSON.parse(localStorage.getItem(CAMTRAVEL_TRIPS_KEY)) || []; }
+  catch (e) { return []; }
+}
+function camtravelLocalGetAgencies() {
+  camtravelSeedLocalCatalog();
+  try { return JSON.parse(localStorage.getItem(CAMTRAVEL_AGENCIES_KEY)) || []; }
+  catch (e) { return []; }
+}
+
+
 
 function camtravelSupabaseReady() {
   return window.CAMTRAVEL_SUPABASE_ENABLED === true && window.camtravelSupabase;
@@ -57,12 +135,7 @@ function camtravelMapReservationRow(row) {
     method: row.method, methodLabel: row.method_label,
     used: row.used, usedAt: row.used_at, createdAt: row.created_at,
     tripId: row.trip_id, seatNumbers: row.seat_numbers,
-    refundStatus: row.refund_status, refundReason: row.refund_reason, refundRequestedAt: row.refund_requested_at,
-    // Association agence + vente guichet + sync hors ligne
-    source: row.source || 'web',
-    soldByAgencyId: row.sold_by_agency_id || null,
-    clientLocalId: row.client_local_id || null,
-    syncedAt: row.synced_at || null
+    refundStatus: row.refund_status, refundReason: row.refund_reason, refundRequestedAt: row.refund_requested_at
   };
 }
 function camtravelMapTripRow(row) {
@@ -72,22 +145,8 @@ function camtravelMapTripRow(row) {
     from: row.from_city, to: row.to_city,
     dep: row.dep_time, arr: row.arr_time, duration: row.duration,
     price: row.price, tags: (row.tags || '').split(',').map(t => t.trim()).filter(Boolean),
-    seatCount: row.seat_count,
-    // Sièges réservés au guichet (non proposés en ligne)
-    agencyQuota: row.agency_quota != null ? Number(row.agency_quota) : 10,
-    active: row.active, createdAt: row.created_at
+    seatCount: row.seat_count, active: row.active, createdAt: row.created_at
   };
-}
-
-/** Nombre de sièges visibles / vendables sur le web (hors quota guichet). */
-function camtravelWebSeatLimit(tripOrSeatCount, agencyQuota) {
-  const total = typeof tripOrSeatCount === 'object'
-    ? (Number(tripOrSeatCount.seatCount) || 40)
-    : (Number(tripOrSeatCount) || 40);
-  const quota = typeof tripOrSeatCount === 'object'
-    ? Math.min(Math.max(Number(tripOrSeatCount.agencyQuota) || 10, 0), total)
-    : Math.min(Math.max(Number(agencyQuota) || 10, 0), total);
-  return Math.max(0, total - quota);
 }
 function camtravelMapColisRow(row) {
   return {
@@ -207,202 +266,8 @@ async function camtravelGetUsers() {
   return camtravelLocalGet(CAMTRAVEL_USERS_KEY);
 }
 
-// ---------- FILE D'ATTENTE HORS LIGNE (ventes agence / guichet) ----------
-function camtravelNewLocalId() {
-  return 'L' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
-}
-
-function camtravelGetPendingReservations() {
-  return camtravelLocalGet(CAMTRAVEL_PENDING_RESERVATIONS_KEY);
-}
-
-function camtravelSetPendingReservations(list) {
-  localStorage.setItem(CAMTRAVEL_PENDING_RESERVATIONS_KEY, JSON.stringify(list || []));
-}
-
-function camtravelGetPendingReservationsCount() {
-  return camtravelGetPendingReservations().length;
-}
-
-/** Ajoute (ou remplace) une vente dans la file d'attente, sans doublon. */
-function camtravelEnqueuePendingReservation(entry) {
-  const list = camtravelGetPendingReservations().filter(
-    r => r.clientLocalId !== entry.clientLocalId
-  );
-  list.unshift(entry);
-  camtravelSetPendingReservations(list);
-}
-
-function camtravelRemovePendingReservation(clientLocalId) {
-  camtravelSetPendingReservations(
-    camtravelGetPendingReservations().filter(r => r.clientLocalId !== clientLocalId)
-  );
-}
-
-/**
- * Envoie UNE vente de la file vers Supabase via la RPC idempotente
- * camtravel_sync_agency_reservation (schéma SQL).
- */
-async function camtravelSyncOnePendingReservation(r) {
-  if (!camtravelSupabaseReady()) {
-    throw new Error('Supabase non configuré');
-  }
-  const { data, error } = await window.camtravelSupabase.rpc('camtravel_sync_agency_reservation', {
-    p_client_local_id: r.clientLocalId,
-    p_ref: r.ref || null,
-    p_company: r.company || null,
-    p_from_city: r.from || null,
-    p_to_city: r.to || null,
-    p_travel_date: r.date || null,
-    p_dep: r.dep || null,
-    p_price: r.price != null ? Number(r.price) : null,
-    p_passagers: r.passagers != null ? Number(r.passagers) : 1,
-    p_total: r.total != null ? Number(r.total) : null,
-    p_passager_nom: r.passagerNom || null,
-    p_passager_tel: r.passagerTel || null,
-    p_method: r.method || null,
-    p_method_label: r.methodLabel || null,
-    p_trip_id: r.tripId || null,
-    p_seat_numbers: r.seatNumbers || null,
-    p_sold_by_agency_id: r.soldByAgencyId || null,
-    p_created_at: r.createdAt || null
-  });
-  if (error) throw error;
-  return data;
-}
-
-/**
- * Vide la file d'attente vers Supabase.
- * Appelée au retour du réseau, au chargement de page, et périodiquement.
- * @returns {{ ok: boolean, synced: number, remaining: number, errors?: string[] }}
- */
-async function camtravelFlushPendingReservations() {
-  const pending = camtravelGetPendingReservations();
-  if (pending.length === 0) {
-    return { ok: true, synced: 0, remaining: 0 };
-  }
-  if (!camtravelSupabaseReady()) {
-    return { ok: false, synced: 0, remaining: pending.length, errors: ['no-supabase'] };
-  }
-  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-    return { ok: false, synced: 0, remaining: pending.length, errors: ['offline'] };
-  }
-
-  let synced = 0;
-  const stillPending = [];
-  const errors = [];
-
-  for (const r of pending) {
-    try {
-      await camtravelSyncOnePendingReservation(r);
-      synced++;
-      // Marque la copie locale comme synchronisée (historique guichet)
-      try {
-        const local = camtravelLocalGet(CAMTRAVEL_RESERVATIONS_KEY);
-        const idx = local.findIndex(x => x.clientLocalId === r.clientLocalId);
-        if (idx >= 0) {
-          local[idx] = { ...local[idx], syncedAt: new Date().toISOString(), pending: false };
-          localStorage.setItem(CAMTRAVEL_RESERVATIONS_KEY, JSON.stringify(local));
-        }
-      } catch (_) { /* ignore */ }
-    } catch (e) {
-      console.warn('Sync vente agence échouée pour', r.clientLocalId, e);
-      stillPending.push(r);
-      errors.push((e && e.message) ? e.message : String(e));
-    }
-  }
-
-  camtravelSetPendingReservations(stillPending);
-
-  if (synced > 0) {
-    try {
-      window.dispatchEvent(new CustomEvent('camtravel:pending-synced', {
-        detail: { synced, remaining: stillPending.length }
-      }));
-    } catch (_) { /* navigateurs très anciens */ }
-  }
-
-  return {
-    ok: stillPending.length === 0,
-    synced,
-    remaining: stillPending.length,
-    errors: errors.length ? errors : undefined
-  };
-}
-
-/**
- * Démarre l'écoute du réseau + tentatives périodiques.
- * Idempotent (une seule fois par chargement de page).
- */
-function camtravelStartPendingSyncWatcher() {
-  if (typeof window === 'undefined' || window.__camtravelPendingWatcher) return;
-  window.__camtravelPendingWatcher = true;
-
-  window.addEventListener('online', () => {
-    camtravelFlushPendingReservations();
-  });
-
-  // Première tentative après chargement (session / Supabase prêts)
-  setTimeout(() => { camtravelFlushPendingReservations(); }, 1800);
-
-  // Relance toutes les 60 s s'il reste des ventes en attente
-  setInterval(() => {
-    if (camtravelGetPendingReservations().length === 0) return;
-    if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
-    camtravelFlushPendingReservations();
-  }, 60000);
-}
-
-camtravelStartPendingSyncWatcher();
-
 // ---------- RÉSERVATIONS (billets) ----------
 async function camtravelSaveReservation(reservation) {
-  const isAgency =
-    reservation.source === 'agency' || !!reservation.soldByAgencyId;
-
-  // ----- Vente guichet / agence : toujours local + file d'attente -----
-  if (isAgency) {
-    const entry = {
-      ...reservation,
-      source: 'agency',
-      clientLocalId: reservation.clientLocalId || camtravelNewLocalId(),
-      createdAt: reservation.createdAt || new Date().toISOString(),
-      id: reservation.id || ('R' + Date.now()),
-      pending: true
-    };
-
-    // Historique local (visible même hors ligne)
-    const local = camtravelLocalGet(CAMTRAVEL_RESERVATIONS_KEY);
-    if (!local.some(x => x.clientLocalId === entry.clientLocalId)) {
-      camtravelLocalAdd(CAMTRAVEL_RESERVATIONS_KEY, entry);
-    }
-
-    camtravelEnqueuePendingReservation(entry);
-
-    const online = typeof navigator === 'undefined' || navigator.onLine !== false;
-    if (camtravelSupabaseReady() && online) {
-      try {
-        await camtravelSyncOnePendingReservation(entry);
-        camtravelRemovePendingReservation(entry.clientLocalId);
-        try {
-          const list = camtravelLocalGet(CAMTRAVEL_RESERVATIONS_KEY);
-          const idx = list.findIndex(x => x.clientLocalId === entry.clientLocalId);
-          if (idx >= 0) {
-            list[idx] = { ...list[idx], syncedAt: new Date().toISOString(), pending: false };
-            localStorage.setItem(CAMTRAVEL_RESERVATIONS_KEY, JSON.stringify(list));
-          }
-        } catch (_) { /* ignore */ }
-        return { ok: true, mode: 'supabase', clientLocalId: entry.clientLocalId };
-      } catch (e) {
-        console.warn("Vente agence enregistrée en file d'attente (sync plus tard).", e);
-        return { ok: true, mode: 'pending', clientLocalId: entry.clientLocalId };
-      }
-    }
-
-    return { ok: true, mode: 'pending', clientLocalId: entry.clientLocalId };
-  }
-
-  // ----- Réservation web (client) : comportement inchangé -----
   if (camtravelSupabaseReady()) {
     try {
       const currentUser = await camtravelGetCurrentUser();
@@ -415,11 +280,7 @@ async function camtravelSaveReservation(reservation) {
         method: reservation.method, method_label: reservation.methodLabel,
         user_id: currentUser ? currentUser.id : null,
         trip_id: reservation.tripId || null,
-        seat_numbers: reservation.seatNumbers || null,
-        source: reservation.source || 'web',
-        sold_by_agency_id: reservation.soldByAgencyId || null,
-        client_local_id: reservation.clientLocalId || null,
-        synced_at: reservation.syncedAt || null
+        seat_numbers: reservation.seatNumbers || null
       };
       const { error } = await window.camtravelSupabase.from('reservations').insert(row);
       if (error) throw error;
@@ -655,33 +516,39 @@ function camtravelMarkClientAllSeen(userId) {
 
 // ---------- TRAJETS (recherche publique, remplace l'ancien tableau en dur) ----------
 async function camtravelGetTrips(criteria) {
-  if (!camtravelSupabaseReady()) return [];
   const from = criteria && criteria.from;
   const to = criteria && criteria.to;
-  try {
-    let query = window.camtravelSupabase.from('trips').select('*, agencies(name)').eq('active', true);
-    if (from) query = query.eq('from_city', from);
-    if (to) query = query.eq('to_city', to);
-    const { data, error } = await query.order('dep_time', { ascending: true });
-    if (error) throw error;
-    return data.map(camtravelMapTripRow);
-  } catch (e) {
-    console.warn('Supabase indisponible pour la recherche de trajets.', e);
-    return [];
+  if (camtravelSupabaseReady()) {
+    try {
+      let query = window.camtravelSupabase.from('trips').select('*, agencies(name)').eq('active', true);
+      if (from) query = query.eq('from_city', from);
+      if (to) query = query.eq('to_city', to);
+      const { data, error } = await query.order('dep_time', { ascending: true });
+      if (error) throw error;
+      return data.map(camtravelMapTripRow);
+    } catch (e) {
+      console.warn('Supabase indisponible pour la recherche de trajets, mode local.', e);
+    }
   }
+  let trips = camtravelLocalGetTrips().filter(t => t.active !== false);
+  if (from) trips = trips.filter(t => t.from === from);
+  if (to) trips = trips.filter(t => t.to === to);
+  return trips;
 }
 
 async function camtravelGetTripById(id) {
-  if (!camtravelSupabaseReady() || !id) return null;
-  try {
-    const { data, error } = await window.camtravelSupabase
-      .from('trips').select('*, agencies(name)').eq('id', id).maybeSingle();
-    if (error) throw error;
-    return data ? camtravelMapTripRow(data) : null;
-  } catch (e) {
-    console.warn('Supabase indisponible pour charger ce trajet.', e);
-    return null;
+  if (!id) return null;
+  if (camtravelSupabaseReady()) {
+    try {
+      const { data, error } = await window.camtravelSupabase
+        .from('trips').select('*, agencies(name)').eq('id', id).maybeSingle();
+      if (error) throw error;
+      if (data) return camtravelMapTripRow(data);
+    } catch (e) {
+      console.warn('Supabase indisponible pour charger ce trajet.', e);
+    }
   }
+  return camtravelLocalGetTrips().find(t => t.id === id) || null;
 }
 
 // Sièges déjà pris pour CE trajet à CETTE date précise (une même ligne
@@ -714,28 +581,45 @@ async function camtravelGetOccupiedSeats(tripId, travelDate) {
 // ---------- AGENCES ----------
 // Agence correspondant au compte actuellement connecté (agency-dashboard.html).
 async function camtravelGetMyAgency() {
+  // 1) Session agence locale (mode hors-ligne / démo)
+  try {
+    const sess = JSON.parse(localStorage.getItem(CAMTRAVEL_AGENCY_SESSION) || 'null');
+    if (sess && sess.agency_id) {
+      const agencies = camtravelLocalGetAgencies();
+      const found = agencies.find(a => a.id === sess.agency_id);
+      if (found) {
+        return {
+          id: found.id,
+          name: found.name,
+          email: found.email || sess.email,
+          tel: found.tel,
+          ville: found.ville,
+          commission_percent: found.commission_percent || 10,
+          status: found.status || 'active',
+          role: sess.role || 'agence_admin'
+        };
+      }
+      // session seule
+      return {
+        id: sess.agency_id,
+        name: sess.name || 'Agence',
+        email: sess.email,
+        commission_percent: 10,
+        status: 'active',
+        role: sess.role || 'agence_admin'
+      };
+    }
+  } catch (e) {}
+
+  // 2) Supabase : email du compte = email de l'agence (role agence_admin)
   if (!camtravelSupabaseReady()) return null;
   const user = await camtravelGetCurrentUser();
   if (!user || !user.email) return null;
-  const email = user.email.toLowerCase();
   try {
-    // 1) Ancien mode : email directement sur agencies
     const { data, error } = await window.camtravelSupabase
-      .from('agencies').select('*').eq('email', email).maybeSingle();
+      .from('agencies').select('*').eq('email', user.email.toLowerCase()).maybeSingle();
     if (error) throw error;
-    if (data) return data;
-
-    // 2) Nouveau mode : membre actif dans agency_members
-    const membership = await camtravelGetMyMembership();
-    if (membership && membership.agency_id && membership.status === 'active') {
-      const { data: agency, error: aErr } = await window.camtravelSupabase
-        .from('agencies').select('*').eq('id', membership.agency_id).maybeSingle();
-      if (aErr) throw aErr;
-      if (agency) {
-        agency._membership = membership;
-        return agency;
-      }
-    }
+    if (data) return { ...data, role: 'agence_admin' };
     return null;
   } catch (e) {
     console.warn('Supabase indisponible pour charger l\'agence.', e);
@@ -743,18 +627,59 @@ async function camtravelGetMyAgency() {
   }
 }
 
+/** Connexion locale d'un compte agence (email + mot de passe) */
+function camtravelAgencyLoginLocal(email, password) {
+  camtravelSeedLocalCatalog();
+  let accounts = [];
+  try { accounts = JSON.parse(localStorage.getItem(CAMTRAVEL_AGENCY_ACCOUNTS_KEY) || '[]'); } catch (e) {}
+  const emailL = (email || '').trim().toLowerCase();
+  const acc = accounts.find(a => a.email === emailL && a.password === password);
+  if (!acc) {
+    // aussi accepter email d'agence listée avec mot de passe agence123
+    const agencies = camtravelLocalGetAgencies();
+    const ag = agencies.find(a => (a.email || '').toLowerCase() === emailL);
+    if (ag && (password === 'agence123' || password === 'password')) {
+      const session = { email: emailL, agency_id: ag.id, name: ag.name, role: 'agence_admin' };
+      localStorage.setItem(CAMTRAVEL_AGENCY_SESSION, JSON.stringify(session));
+      return { ok: true, session, agency: ag };
+    }
+    return { ok: false, reason: 'invalid' };
+  }
+  const session = {
+    email: acc.email,
+    agency_id: acc.agency_id,
+    name: acc.name,
+    role: acc.role || 'agence_admin'
+  };
+  localStorage.setItem(CAMTRAVEL_AGENCY_SESSION, JSON.stringify(session));
+  const agencies = camtravelLocalGetAgencies();
+  const agency = agencies.find(a => a.id === acc.agency_id) || { id: acc.agency_id, name: acc.name };
+  return { ok: true, session, agency };
+}
+
+function camtravelAgencyLogoutLocal() {
+  localStorage.removeItem(CAMTRAVEL_AGENCY_SESSION);
+}
+
+function camtravelGetAgencySession() {
+  try { return JSON.parse(localStorage.getItem(CAMTRAVEL_AGENCY_SESSION) || 'null'); }
+  catch (e) { return null; }
+}
+
+
 // Toutes les agences (page admin "agencies.html").
 async function camtravelGetAgencies() {
-  if (!camtravelSupabaseReady()) return [];
-  try {
-    const { data, error } = await window.camtravelSupabase
-      .from('agencies').select('*').order('created_at', { ascending: false });
-    if (error) throw error;
-    return data;
-  } catch (e) {
-    console.warn('Supabase indisponible pour charger les agences.', e);
-    return [];
+  if (camtravelSupabaseReady()) {
+    try {
+      const { data, error } = await window.camtravelSupabase
+        .from('agencies').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    } catch (e) {
+      console.warn('Supabase indisponible pour charger les agences.', e);
+    }
   }
+  return camtravelLocalGetAgencies();
 }
 
 async function camtravelSaveAgency(agency) {
@@ -788,137 +713,131 @@ async function camtravelUpdateAgencyStatus(id, status) {
 
 // ---------- TRAJETS D'UNE AGENCE (agency-dashboard.html) ----------
 async function camtravelGetAgencyTrips(agencyId) {
-  if (!camtravelSupabaseReady() || !agencyId) return [];
-  try {
-    const { data, error } = await window.camtravelSupabase
-      .from('trips').select('*').eq('agency_id', agencyId).order('created_at', { ascending: false });
-    if (error) throw error;
-    return data.map(camtravelMapTripRow);
-  } catch (e) {
-    console.warn('Impossible de charger les trajets de l\'agence.', e);
-    return [];
+  if (!agencyId) return [];
+  if (camtravelSupabaseReady()) {
+    try {
+      const { data, error } = await window.camtravelSupabase
+        .from('trips').select('*').eq('agency_id', agencyId).order('created_at', { ascending: false });
+      if (error) throw error;
+      return data.map(camtravelMapTripRow);
+    } catch (e) {
+      console.warn('Impossible de charger les trajets de l\'agence.', e);
+    }
   }
+  return camtravelLocalGetTrips().filter(t => t.agencyId === agencyId);
 }
 
 async function camtravelSaveTrip(trip) {
-  if (!camtravelSupabaseReady()) return { ok: false };
-  try {
-    const seatCount = trip.seatCount || 40;
-    let agencyQuota = trip.agencyQuota != null ? Number(trip.agencyQuota) : 10;
-    if (isNaN(agencyQuota) || agencyQuota < 0) agencyQuota = 10;
-    if (agencyQuota > seatCount) agencyQuota = seatCount;
-    const row = {
-      agency_id: trip.agencyId, from_city: trip.from, to_city: trip.to,
-      dep_time: trip.dep, arr_time: trip.arr, duration: trip.duration,
-      price: trip.price, tags: trip.tags,
-      seat_count: seatCount,
-      agency_quota: agencyQuota
-    };
-    const { error } = await window.camtravelSupabase.from('trips').insert(row);
-    if (error) throw error;
-    return { ok: true };
-  } catch (e) {
-    console.warn("Impossible d'ajouter le trajet.", e);
-    return { ok: false };
+  if (camtravelSupabaseReady()) {
+    try {
+      const row = {
+        agency_id: trip.agencyId, from_city: trip.from, to_city: trip.to,
+        dep_time: trip.dep, arr_time: trip.arr, duration: trip.duration,
+        price: trip.price, tags: trip.tags, seat_count: trip.seatCount || 40
+      };
+      if (trip.id) {
+        const { error } = await window.camtravelSupabase.from('trips').update(row).eq('id', trip.id);
+        if (error) throw error;
+      } else {
+        const { error } = await window.camtravelSupabase.from('trips').insert(row);
+        if (error) throw error;
+      }
+      return { ok: true };
+    } catch (e) {
+      console.warn("Impossible d'enregistrer le trajet (Supabase).", e);
+    }
   }
-}
-
-/**
- * Sièges occupés pour un trajet + date, y compris les ventes encore
- * en file d'attente sur CE poste (hors ligne).
- */
-async function camtravelGetOccupiedSeatsIncludingPending(tripId, travelDate) {
-  const occupied = typeof camtravelGetOccupiedSeats === 'function'
-    ? await camtravelGetOccupiedSeats(tripId, travelDate)
-    : [];
-  const pending = camtravelGetPendingReservations().filter(
-    r => r.tripId === tripId && String(r.date) === String(travelDate)
-  );
-  pending.forEach(r => {
-    String(r.seatNumbers || '').split(',').forEach(s => {
-      const n = parseInt(s.trim(), 10);
-      if (!isNaN(n)) occupied.push(n);
-    });
-  });
-  return [...new Set(occupied)];
+  // Mode local
+  const trips = camtravelLocalGetTrips();
+  if (trip.id) {
+    const i = trips.findIndex(x => x.id === trip.id);
+    if (i >= 0) {
+      trips[i] = {
+        ...trips[i],
+        from: trip.from, to: trip.to, dep: trip.dep, arr: trip.arr,
+        duration: trip.duration || trips[i].duration,
+        price: Number(trip.price), tags: Array.isArray(trip.tags) ? trip.tags : String(trip.tags || '').split(',').map(s => s.trim()).filter(Boolean),
+        seatCount: trip.seatCount || 40, active: trip.active !== false,
+        vehicleId: trip.vehicleId !== undefined ? trip.vehicleId : trips[i].vehicleId,
+        busName: trip.busName !== undefined ? trip.busName : trips[i].busName,
+        matricule: trip.matricule !== undefined ? trip.matricule : trips[i].matricule,
+        layoutId: trip.layoutId !== undefined ? trip.layoutId : trips[i].layoutId,
+        vip: trip.vip !== undefined ? !!trip.vip : trips[i].vip
+      };
+      localStorage.setItem(CAMTRAVEL_TRIPS_KEY, JSON.stringify(trips));
+      return { ok: true, entry: trips[i] };
+    }
+  }
+  const entry = {
+    id: 't-' + Date.now().toString(36),
+    agencyId: trip.agencyId,
+    company: trip.company || '',
+    from: trip.from, to: trip.to,
+    dep: trip.dep, arr: trip.arr,
+    duration: trip.duration || '',
+    price: Number(trip.price) || 0,
+    tags: Array.isArray(trip.tags) ? trip.tags : String(trip.tags || 'Climatisé').split(',').map(s => s.trim()).filter(Boolean),
+    seatCount: trip.seatCount || 40,
+    vehicleId: trip.vehicleId || '',
+    busName: trip.busName || '',
+    matricule: trip.matricule || '',
+    layoutId: trip.layoutId || '',
+    vip: !!trip.vip,
+    active: true
+  };
+  trips.unshift(entry);
+  localStorage.setItem(CAMTRAVEL_TRIPS_KEY, JSON.stringify(trips));
+  return { ok: true, entry };
 }
 
 async function camtravelUpdateTripActive(id, active) {
-  if (!camtravelSupabaseReady()) return false;
-  try {
-    const { error } = await window.camtravelSupabase.from('trips').update({ active }).eq('id', id);
-    if (error) throw error;
-    return true;
-  } catch (e) {
-    console.warn('Impossible de mettre à jour le trajet.', e);
-    return false;
+  if (camtravelSupabaseReady()) {
+    try {
+      const { error } = await window.camtravelSupabase.from('trips').update({ active }).eq('id', id);
+      if (error) throw error;
+      return true;
+    } catch (e) {
+      console.warn('Impossible de changer le statut du trajet.', e);
+    }
   }
+  const trips = camtravelLocalGetTrips();
+  const i = trips.findIndex(x => x.id === id);
+  if (i < 0) return false;
+  trips[i].active = !!active;
+  localStorage.setItem(CAMTRAVEL_TRIPS_KEY, JSON.stringify(trips));
+  return true;
 }
 
 async function camtravelDeleteTrip(id) {
-  if (!camtravelSupabaseReady()) return false;
-  try {
-    const { error } = await window.camtravelSupabase.from('trips').delete().eq('id', id);
-    if (error) throw error;
-    return true;
-  } catch (e) {
-    console.warn('Impossible de supprimer le trajet.', e);
-    return false;
+  if (camtravelSupabaseReady()) {
+    try {
+      const { error } = await window.camtravelSupabase.from('trips').delete().eq('id', id);
+      if (error) throw error;
+      return true;
+    } catch (e) {
+      console.warn('Impossible de supprimer le trajet.', e);
+    }
   }
+  const trips = camtravelLocalGetTrips().filter(x => x.id !== id);
+  localStorage.setItem(CAMTRAVEL_TRIPS_KEY, JSON.stringify(trips));
+  return true;
 }
 
-// Réservations touchant les trajets d'UNE agence (deux requêtes simples
-// au lieu d'une jointure, pour rester compatible avec toutes les versions
-// de Supabase sans configuration supplémentaire).
-// Fusionne aussi les ventes encore en file d'attente hors ligne sur CE poste,
-// pour que le guichet les voie immédiatement même sans Internet.
 async function camtravelGetAgencyReservations(agencyId) {
-  const pendingForAgency = () => camtravelGetPendingReservations()
-    .filter(r => !agencyId || r.soldByAgencyId === agencyId)
-    .map(r => ({ ...r, pending: true, source: r.source || 'agency' }));
-
-  if (!camtravelSupabaseReady() || !agencyId) {
-    return pendingForAgency();
-  }
+  if (!camtravelSupabaseReady() || !agencyId) return [];
   try {
     const { data: trips, error: tripsError } = await window.camtravelSupabase
       .from('trips').select('id').eq('agency_id', agencyId);
     if (tripsError) throw tripsError;
     const tripIds = (trips || []).map(t => t.id);
-
-    let remote = [];
-    if (tripIds.length > 0) {
-      const { data, error } = await window.camtravelSupabase
-        .from('reservations').select('*').in('trip_id', tripIds).order('created_at', { ascending: false });
-      if (error) throw error;
-      remote = data.map(camtravelMapReservationRow);
-    }
-
-    // Aussi les ventes liées à l'agence via sold_by_agency_id (sans trip_id)
-    try {
-      const { data: byAgency, error: byAgencyErr } = await window.camtravelSupabase
-        .from('reservations')
-        .select('*')
-        .eq('sold_by_agency_id', agencyId)
-        .order('created_at', { ascending: false });
-      if (!byAgencyErr && byAgency) {
-        const seen = new Set(remote.map(r => r.id));
-        byAgency.map(camtravelMapReservationRow).forEach(r => {
-          if (!seen.has(r.id)) remote.push(r);
-        });
-      }
-    } catch (_) { /* colonne absente si schéma pas encore mis à jour */ }
-
-    const pending = pendingForAgency();
-    const remoteLocalIds = new Set(remote.map(r => r.clientLocalId).filter(Boolean));
-    const onlyPending = pending.filter(r => !remoteLocalIds.has(r.clientLocalId));
-
-    return [...onlyPending, ...remote].sort(
-      (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
-    );
+    if (tripIds.length === 0) return [];
+    const { data, error } = await window.camtravelSupabase
+      .from('reservations').select('*').in('trip_id', tripIds).order('created_at', { ascending: false });
+    if (error) throw error;
+    return data.map(camtravelMapReservationRow);
   } catch (e) {
     console.warn("Impossible de charger les réservations de l'agence.", e);
-    return pendingForAgency();
+    return [];
   }
 }
 
@@ -986,153 +905,5 @@ async function camtravelSetRefundStatus(reservationId, status) {
   } catch (e) {
     console.warn('Impossible de mettre à jour le remboursement.', e);
     return false;
-  }
-}
-
-// ---------- ÉQUIPE AGENCE (membres, licenciements, historique) ----------
-function camtravelMapMemberRow(row) {
-  if (!row) return null;
-  return {
-    id: row.id,
-    agencyId: row.agency_id,
-    branchId: row.branch_id,
-    counterId: row.counter_id,
-    email: row.email,
-    userId: row.user_id,
-    role: row.role,
-    status: row.status,
-    hiredAt: row.hired_at,
-    terminatedAt: row.terminated_at,
-    terminationReason: row.termination_reason,
-    terminationNote: row.termination_note,
-    createdAt: row.created_at
-  };
-}
-
-/** Membre actif lié à l'email connecté (null si licencié / inexistant). */
-async function camtravelGetMyMembership() {
-  if (!camtravelSupabaseReady()) return null;
-  const user = await camtravelGetCurrentUser();
-  if (!user || !user.email) return null;
-  try {
-    const { data, error } = await window.camtravelSupabase
-      .from('agency_members')
-      .select('*')
-      .eq('email', user.email.toLowerCase())
-      .order('created_at', { ascending: false })
-      .limit(5);
-    if (error) throw error;
-    const active = (data || []).find(m => m.status === 'active');
-    return active || null;
-  } catch (e) {
-    console.warn('Impossible de charger le membership.', e);
-    return null;
-  }
-}
-
-async function camtravelGetAgencyMembers(agencyId, opts) {
-  if (!camtravelSupabaseReady() || !agencyId) return [];
-  const includeTerminated = !!(opts && opts.includeTerminated);
-  try {
-    let q = window.camtravelSupabase
-      .from('agency_members')
-      .select('*')
-      .eq('agency_id', agencyId)
-      .order('created_at', { ascending: false });
-    if (!includeTerminated) q = q.in('status', ['active', 'invited', 'suspended']);
-    const { data, error } = await q;
-    if (error) throw error;
-    return (data || []).map(camtravelMapMemberRow);
-  } catch (e) {
-    console.warn('Impossible de lister les membres.', e);
-    return [];
-  }
-}
-
-async function camtravelAddAgencyMember(agencyId, email, role, branchId, counterId) {
-  if (!camtravelSupabaseReady()) return { ok: false, reason: 'no-supabase' };
-  try {
-    const { data, error } = await window.camtravelSupabase.rpc('camtravel_add_agency_member', {
-      p_agency_id: agencyId,
-      p_email: email,
-      p_role: role || 'cashier',
-      p_branch_id: branchId || null,
-      p_counter_id: counterId || null
-    });
-    if (error) throw error;
-    return { ok: true, member: camtravelMapMemberRow(data) };
-  } catch (e) {
-    console.warn("Impossible d'ajouter le membre.", e);
-    return { ok: false, reason: (e && e.message) || 'error' };
-  }
-}
-
-async function camtravelTerminateMember(memberId, reason, note) {
-  if (!camtravelSupabaseReady()) return { ok: false, reason: 'no-supabase' };
-  try {
-    const { data, error } = await window.camtravelSupabase.rpc('camtravel_terminate_member', {
-      p_member_id: memberId,
-      p_reason: reason || 'layoff',
-      p_note: note || null
-    });
-    if (error) throw error;
-    return { ok: !!data };
-  } catch (e) {
-    console.warn('Impossible de licencier le membre.', e);
-    return { ok: false, reason: (e && e.message) || 'error' };
-  }
-}
-
-async function camtravelGetAgencyBranches(agencyId) {
-  if (!camtravelSupabaseReady() || !agencyId) return [];
-  try {
-    const { data, error } = await window.camtravelSupabase
-      .from('agency_branches').select('*').eq('agency_id', agencyId).order('city');
-    if (error) throw error;
-    return data || [];
-  } catch (e) {
-    console.warn('Impossible de charger les succursales.', e);
-    return [];
-  }
-}
-
-async function camtravelSaveAgencyBranch(agencyId, name, city, address) {
-  if (!camtravelSupabaseReady()) return { ok: false };
-  try {
-    const { error } = await window.camtravelSupabase.from('agency_branches').insert({
-      agency_id: agencyId, name, city, address: address || null
-    });
-    if (error) throw error;
-    return { ok: true };
-  } catch (e) {
-    console.warn("Impossible d'ajouter la succursale.", e);
-    return { ok: false };
-  }
-}
-
-async function camtravelGetAgencyCounters(branchId) {
-  if (!camtravelSupabaseReady() || !branchId) return [];
-  try {
-    const { data, error } = await window.camtravelSupabase
-      .from('agency_counters').select('*').eq('branch_id', branchId).order('name');
-    if (error) throw error;
-    return data || [];
-  } catch (e) {
-    console.warn('Impossible de charger les guichets.', e);
-    return [];
-  }
-}
-
-async function camtravelSaveAgencyCounter(branchId, name, neighborhood, address) {
-  if (!camtravelSupabaseReady()) return { ok: false };
-  try {
-    const { error } = await window.camtravelSupabase.from('agency_counters').insert({
-      branch_id: branchId, name, neighborhood: neighborhood || null, address: address || null
-    });
-    if (error) throw error;
-    return { ok: true };
-  } catch (e) {
-    console.warn("Impossible d'ajouter le guichet.", e);
-    return { ok: false };
   }
 }

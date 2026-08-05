@@ -8,8 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="js/theme.js"></script>
+<script src="js/i18n.js"></script>
 </head>
-<body>
+<body class="role-client">
 <div class="dash-layout">
 
   <!-- SIDEBAR -->
@@ -27,6 +28,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
         Réservations
       </a>
+      <a href="location-bus.html">Location bus</a>
       <a href="colis.html">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
         Colis
@@ -103,7 +105,7 @@
         </div>
         <div>
           <p class="label">Réservations</p>
-          <p class="value" id="statMyReservations">3</p>
+          <p class="value" id="statMyReservations">0</p>
           <a href="mes-reservations.html" class="link">Voir toutes</a>
         </div>
       </div>
@@ -113,7 +115,7 @@
         </div>
         <div>
           <p class="label">Trajets à venir</p>
-          <p class="value" id="statUpcoming">2</p>
+          <p class="value" id="statUpcoming">0</p>
           <a href="mes-trajets.html" class="link">Voir tout</a>
         </div>
       </div>
@@ -123,7 +125,7 @@
         </div>
         <div>
           <p class="label">Trajets passés</p>
-          <p class="value" id="statPast">5</p>
+          <p class="value" id="statPast">0</p>
           <a href="mes-trajets.html" class="link">Voir tout</a>
         </div>
       </div>
@@ -133,7 +135,7 @@
         </div>
         <div>
           <p class="label">Dépensé</p>
-          <p class="value" id="statSpent">125 000 FCFA</p>
+          <p class="value" id="statSpent">0 FCFA</p>
         </div>
       </div>
     </div>
@@ -193,11 +195,29 @@
         </div>
       </div>
     </div>
+      <div class="panel panel-chart anim-fade-up" style="margin-top:20px;">
+      <h3 class="dash-section-title">Mes dépenses mensuelles (6 mois)</h3>
+      <div id="monthlyChartClient"><div class="empty-state">Chargement…</div></div>
+    </div>
+
+    <div class="panel anim-fade-up" style="margin-top:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h3 style="margin:0;">Mes réservations récentes</h3>
+        <a href="mes-reservations.html" class="link">Voir toutes</a>
+      </div>
+      <div id="clientRecentList"><div class="empty-state">Chargement…</div></div>
+    </div>
   </main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/data-store.js"></script>
+<script src="js/monthly-stats.js"></script>
+<script src="js/notif-badge.js"></script>
+<script src="js/notifications-store.js"></script>
+<script src="js/email-notifications.js"></script>
+<script src="js/email-config.js"></script>
+<script src="js/push-notifications.js"></script>
 <script src="js/auth-guard.js"></script>
 <script src="js/script-dashboard-client.js"></script>
 <script src="js/chatbot.js"></script>

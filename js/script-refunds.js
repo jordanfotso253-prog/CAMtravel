@@ -52,6 +52,14 @@ function render(reservations) {
       if (ok) {
         banner.className = 'status-banner show success';
         banner.textContent = 'Votre demande de remboursement a été envoyée.';
+        if (typeof camtravelNotify !== 'undefined') {
+          try { await camtravelNotify.refundUpdate(btn.dataset.refundId || 'REF', 'requested'); } catch (e) {}
+        }
+        if (typeof camtravelEmail !== 'undefined') {
+          try { await camtravelEmail.sendRefund('requested', { ref: btn.dataset.refundId || 'REF' }); } catch (e) {}
+        } else if (typeof camtravelPush !== 'undefined') {
+          try { await camtravelPush.notifyRefundUpdate(btn.dataset.refundId || 'REF', 'requested'); } catch (e) {}
+        }
         init();
       } else {
         btn.disabled = false;

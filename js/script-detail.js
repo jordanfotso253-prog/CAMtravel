@@ -2,8 +2,7 @@ const params = new URLSearchParams(window.location.search);
 
 const tripId = params.get('tripId') || '';
 const seatCount = params.get('seatCount') || '40';
-const agencyQuota = params.get('agencyQuota') || '10';
-const company = params.get('company') || 'CAM travel';
+const company = params.get('company') || 'Agence partenaire';
 const dep = params.get('dep') || '08:00 AM';
 const arr = params.get('arr') || '10:30 AM';
 const duration = params.get('duration') || '2h30m';
@@ -35,5 +34,25 @@ document.getElementById('tagsRow').innerHTML = tags.map(t =>
 ).join('');
 
 // Transmet toutes les informations du trajet vers la sélection des sièges
-const nextParams = new URLSearchParams({ tripId, seatCount, agencyQuota, company, dep, arr, duration, price, tags: tags.join(','), from, to, date });
+const nextParams = new URLSearchParams({
+  tripId, seatCount, company, dep, arr, duration, price,
+  tags: tags.join(','), from, to, date,
+  vehicleId: params.get('vehicleId') || '',
+  busName: params.get('busName') || '',
+  matricule: params.get('matricule') || '',
+  layoutId: params.get('layoutId') || '',
+  vip: params.get('vip') || (tags.some(x => /VIP/i.test(x)) ? '1' : '0')
+});
 document.getElementById('continueBtn').href = `seat-selection.html?${nextParams.toString()}`;
+
+// Afficher infos bus si présentes
+const busLine = document.getElementById('busInfoLine');
+if (busLine) {
+  const bn = params.get('busName');
+  const mat = params.get('matricule');
+  const vip = params.get('vip') === '1';
+  if (bn || mat) {
+    busLine.textContent = [bn ? 'Bus : ' + bn : null, mat ? 'Matricule ' + mat : null, vip ? 'VIP' : null].filter(Boolean).join(' · ');
+    busLine.style.display = 'block';
+  }
+}

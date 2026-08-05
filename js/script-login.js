@@ -61,7 +61,22 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
-  // Mode démonstration (Supabase non configuré) : aucune vraie vérification possible.
+  // Mode local : compte agence (role agence_admin + agency_id) ou client
+  const emailVal = (document.getElementById('identifiant') || document.getElementById('email') || {}).value
+    || form.querySelector('input[type="email"]')?.value || '';
+  const passVal = (document.getElementById('pass') || document.getElementById('password') || {}).value
+    || form.querySelector('input[type="password"]')?.value || '';
+
+  if (typeof camtravelAgencyLoginLocal === 'function') {
+    const agLogin = camtravelAgencyLoginLocal(emailVal, passVal);
+    if (agLogin.ok) {
+      banner.className = 'status-banner show success';
+      banner.textContent = 'Espace agence « ' + (agLogin.agency.name || '') + ' » — redirection...';
+      setTimeout(() => { window.location.href = 'agency-dashboard.html'; }, 900);
+      return;
+    }
+  }
+
   banner.className = 'status-banner show success';
   banner.textContent = "Connexion réussie (mode démo — configurez Supabase pour une vraie vérification du mot de passe). Redirection...";
   setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);

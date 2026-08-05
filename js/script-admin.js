@@ -1,37 +1,40 @@
-// Chiffres "de base" (démo) auxquels on ajoute les vraies données enregistrées
-const BASE_USERS = 2450;
-const BASE_RESERVATIONS = 1230;
-
 async function initAdminDashboard() {
-  const [realUsers, realReservations, realColis, realPassengers] = await Promise.all([
+  const [realUsers, realReservations, realColis, realPassengers, agencies] = await Promise.all([
     typeof camtravelGetUsers === 'function' ? camtravelGetUsers() : [],
     typeof camtravelGetReservations === 'function' ? camtravelGetReservations() : [],
     typeof camtravelGetColis === 'function' ? camtravelGetColis() : [],
     typeof camtravelGetPassengers === 'function' ? camtravelGetPassengers() : [],
+    typeof camtravelGetAgencies === 'function' ? camtravelGetAgencies() : [],
   ]);
 
-  document.getElementById('statUsers').innerHTML =
-    `${(BASE_USERS + realUsers.length).toLocaleString('fr-FR')} <span class="growth-badge up">+12%</span>`;
-  document.getElementById('statReservations').innerHTML =
-    `${(BASE_RESERVATIONS + realReservations.length).toLocaleString('fr-FR')} <span class="growth-badge up">+8%</span>`;
+  const revenue = realReservations.reduce((s, r) => s + Number(r.total || 0), 0);
+  const elUsers = document.getElementById('statUsers');
+  const elRes = document.getElementById('statReservations');
+  const elRev = document.getElementById('statRevenue');
+  const elAg = document.getElementById('statAgencies');
+  if (elUsers) elUsers.textContent = realUsers.length.toLocaleString('fr-FR');
+  if (elRes) elRes.textContent = realReservations.length.toLocaleString('fr-FR');
+  if (elRev) elRev.textContent = revenue.toLocaleString('fr-FR') + ' FCFA';
+  if (elAg) elAg.textContent = (agencies.length || 0).toLocaleString('fr-FR');
 
-  // Ajoute les vraies réservations en haut de la liste "Réservations récentes"
   const recentContainer = document.getElementById('recentReservations');
-  if (realReservations.length > 0 && recentContainer) {
-    const rows = realReservations.slice(0, 5).map(r => {
-      const d = new Date(r.createdAt);
-      const dateStr = d.toLocaleDateString('fr-FR');
-      return `
-        <div class="admin-trip-row" style="background:#f2f9f5; border-radius:8px; padding:12px 10px;">
+  if (recentContainer) {
+    if (realReservations.length === 0) {
+      recentContainer.innerHTML = `<div class="empty-state">Aucune réservation pour l'instant.</div>`;
+    } else {
+      recentContainer.innerHTML = realReservations.slice(0, 8).map(r => {
+        const dateStr = r.createdAt ? new Date(r.createdAt).toLocaleDateString('fr-FR') : (r.date || '');
+        return `
+        <div class="admin-trip-row">
           <div>
-            <div class="trip-ref">${r.ref} <span style="color:var(--orange); font-size:10px; font-weight:700;">NOUVEAU</span></div>
-            <div class="trip-route">${r.from} → ${r.to}</div>
-            <div class="trip-meta">${r.passagerNom || ''} · ${r.passagerTel || ''}</div>
+            <div class="trip-ref">${r.ref || '—'}</div>
+            <div class="trip-route">${r.from || ''} → ${r.to || ''}</div>
+            <div class="trip-meta">${r.passagerNom || ''} · ${Number(r.total || 0).toLocaleString('fr-FR')} FCFA</div>
           </div>
           <div class="trip-meta">${dateStr}</div>
         </div>`;
-    }).join('');
-    recentContainer.insertAdjacentHTML('afterbegin', rows);
+      }).join('');
+    }
   }
 
   // ---- Notifications ----
@@ -133,7 +136,16 @@ async function initAdminDashboard() {
             ? await camtravelSetRefundStatus(btn.dataset.id, btn.dataset.refundAction)
             : false;
           if (ok) {
-            btn.closest('[data-refund-row]').remove();
+            const row = btn.closest('[data-refund-row]');
+            const refEl = row && row.querySelector('.trip-ref');
+            const ref = refEl ? refEl.textContent.trim().split(/\s+/)[0] : 'REF';
+            if (typeof camtravelNotify !== 'undefined') {
+              try { await camtravelNotify.refundUpdate(ref, btn.dataset.refundAction); } catch (e) {}
+            }
+            if (typeof camtravelEmail !== 'undefined') {
+              try { await camtravelEmail.sendRefund(btn.dataset.refundAction, { ref }); } catch (e) {}
+            }
+            row.remove();
           } else {
             btn.closest('[data-refund-row]').style.opacity = '1';
           }
@@ -141,6 +153,35 @@ async function initAdminDashboard() {
       });
     }
   }
+
+  // Stats mensuelles réelles
+  const chartEl = document.getElementById('monthlyChartAdmin');
+  if (chartEl && typeof camtravelMonthlyStats !== 'undefined') {
+    const byCount = camtravelMonthlyStats.aggregateByMonth(realReservations, 6);
+    const byRevenue = camtravelMonthlyStats.aggregateByMonth(realReservations, 6, r => Number(r.total || 0));
+    const revK = byRevenue.map(s => ({ ...s, value: Math.round(s.value / 1000) }));
+    camtravelMonthlyStats.renderDualChart(chartEl, byCount, revK, {
+      labelA: 'Réservations',
+      labelB: 'Revenus (k FCFA)',
+      colorA: '#1e3a5f',
+      colorB: '#f5921b',
+      height: 170
+    });
+  }
+
+  if (typeof camtravelStaff !== 'undefined') {
+    const st = document.getElementById('statStaff');
+    if (st) st.textContent = camtravelStaff.list().length;
+  }
+
+  const busSt = document.getElementById('busApiStatus');
+  if (busSt && typeof camtravelBusApi !== 'undefined') {
+    const s = camtravelBusApi.status();
+    busSt.innerHTML = 'API Bus : catalogue local ✓'
+      + (s.supabase ? ' · Supabase ✓' : ' · Supabase —')
+      + (s.externalConfigured ? ' · API externe activée (' + s.baseUrl + ')' : ' · API externe non configurée (js/bus-api-config.js)');
+  }
 }
 
 initAdminDashboard();
+
