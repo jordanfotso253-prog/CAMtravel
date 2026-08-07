@@ -1,0 +1,11 @@
+Corrections CAM travel — page d'accueil
+
+Fichiers inclus :
+- css/style.css  (glassmorphism + fond bus/transport + footer couleurs Cameroun)
+- index.html     (page d'accueil, inchangée structurellement)
+
+Installation :
+1. Remplacez css/style.css de votre projet par celui de cette archive.
+2. Rechargez index.html dans le navigateur.
+
+Date : 2026-08-06

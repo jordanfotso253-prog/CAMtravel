@@ -1,35 +1,40 @@
 /**
  * Protection des pages agence.
- * - Supabase : session auth + ligne agencies.email
- * - Local : session camtravel_agency_session (role agence_admin + agency_id)
+ * - Session locale camtravel_agency_session (role agence_admin + agency_id)
+ * - OU Supabase : session auth + ligne agencies.email
  * Une seule base : filtrage par agency_id dans le dashboard.
+ *
+ * Mode hybride : la session locale est acceptée même si Supabase est
+ * configuré (comptes démo / hors-ligne).
  */
 (async function () {
-  // Mode local
-  if (!(window.CAMTRAVEL_SUPABASE_ENABLED && window.camtravelSupabase)) {
-    const sess = typeof camtravelGetAgencySession === 'function' ? camtravelGetAgencySession() : null;
-    if (!sess || !sess.agency_id) {
-      // laisser un peu de temps au data-store
-      const agency = typeof camtravelGetMyAgency === 'function' ? await camtravelGetMyAgency() : null;
-      if (!agency) {
-        window.location.href = 'connexion.html?role=agence';
-      }
+  // 1) Session locale agence (démo / hors-ligne) — priorité
+  try {
+    const sess = typeof camtravelGetAgencySession === 'function'
+      ? camtravelGetAgencySession()
+      : JSON.parse(localStorage.getItem('camtravel_agency_session') || 'null');
+    if (sess && sess.agency_id) {
+      return; // accès autorisé
     }
-    return;
-  }
+  } catch (e) {}
 
-  window.camtravelSupabase.auth.onAuthStateChange((event, session) => {
-    if (!session) window.location.href = 'connexion.html';
-  });
-
-  const { data } = await window.camtravelSupabase.auth.getUser();
-  if (!data.user) {
-    window.location.href = 'connexion.html';
-    return;
-  }
-
+  // 2) camtravelGetMyAgency (session locale ou email Supabase lié à une agence)
   const agency = typeof camtravelGetMyAgency === 'function' ? await camtravelGetMyAgency() : null;
-  if (!agency) {
-    window.location.href = 'index.html';
+  if (agency && agency.id) {
+    return;
   }
+
+  // 3) Utilisateur Supabase connecté mais sans agence → accueil
+  if (window.CAMTRAVEL_SUPABASE_ENABLED && window.camtravelSupabase) {
+    try {
+      const { data } = await window.camtravelSupabase.auth.getUser();
+      if (data && data.user) {
+        window.location.href = 'index.html';
+        return;
+      }
+    } catch (e) {}
+  }
+
+  // 4) Rien trouvé → page de connexion
+  window.location.href = 'connexion.html?role=agence';
 })();

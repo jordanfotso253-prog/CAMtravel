@@ -714,17 +714,23 @@ async function camtravelUpdateAgencyStatus(id, status) {
 // ---------- TRAJETS D'UNE AGENCE (agency-dashboard.html) ----------
 async function camtravelGetAgencyTrips(agencyId) {
   if (!agencyId) return [];
+  const local = () => camtravelLocalGetTrips().filter(t => t.agencyId === agencyId || t.agency_id === agencyId);
+  // IDs locaux (ag-exp, ag-amour…) → catalogue local en priorité
+  if (typeof agencyId === 'string' && agencyId.indexOf('ag-') === 0) {
+    return local();
+  }
   if (camtravelSupabaseReady()) {
     try {
       const { data, error } = await window.camtravelSupabase
         .from('trips').select('*').eq('agency_id', agencyId).order('created_at', { ascending: false });
       if (error) throw error;
-      return data.map(camtravelMapTripRow);
+      const mapped = (data || []).map(camtravelMapTripRow);
+      if (mapped.length) return mapped;
     } catch (e) {
       console.warn('Impossible de charger les trajets de l\'agence.', e);
     }
   }
-  return camtravelLocalGetTrips().filter(t => t.agencyId === agencyId);
+  return local();
 }
 
 async function camtravelSaveTrip(trip) {
@@ -824,26 +830,80 @@ async function camtravelDeleteTrip(id) {
 }
 
 async function camtravelGetAgencyReservations(agencyId) {
-  if (!camtravelSupabaseReady() || !agencyId) return [];
+  if (!agencyId) return [];
+
+  // Mode local / IDs démo (ag-*)
+  function localReservations() {
+    let all = [];
+    try { all = JSON.parse(localStorage.getItem(CAMTRAVEL_RESERVATIONS_KEY) || '[]'); } catch (e) {}
+    const tripIds = new Set(
+      camtravelLocalGetTrips()
+        .filter(t => t.agencyId === agencyId || t.agency_id === agencyId)
+        .map(t => t.id)
+    );
+    return all.filter(r =>
+      (r.agencyId && r.agencyId === agencyId) ||
+      (r.tripId && tripIds.has(r.tripId)) ||
+      (r.company && (() => {
+        const ag = camtravelLocalGetAgencies().find(a => a.id === agencyId);
+        return ag && r.company === ag.name;
+      })())
+    );
+  }
+
+  if (typeof agencyId === 'string' && agencyId.indexOf('ag-') === 0) {
+    return localReservations();
+  }
+
+  if (!camtravelSupabaseReady()) return localReservations();
+
   try {
     const { data: trips, error: tripsError } = await window.camtravelSupabase
       .from('trips').select('id').eq('agency_id', agencyId);
     if (tripsError) throw tripsError;
     const tripIds = (trips || []).map(t => t.id);
-    if (tripIds.length === 0) return [];
+    if (tripIds.length === 0) return localReservations();
     const { data, error } = await window.camtravelSupabase
       .from('reservations').select('*').in('trip_id', tripIds).order('created_at', { ascending: false });
     if (error) throw error;
-    return data.map(camtravelMapReservationRow);
+    const mapped = (data || []).map(camtravelMapReservationRow);
+    return mapped.length ? mapped : localReservations();
   } catch (e) {
     console.warn("Impossible de charger les réservations de l'agence.", e);
-    return [];
+    return localReservations();
   }
 }
 
 // ---------- COMMISSIONS (page admin "commissions.html") ----------
 async function camtravelGetCommissionsReport() {
-  if (!camtravelSupabaseReady()) return [];
+  function localReport() {
+    const agencies = camtravelLocalGetAgencies();
+    const trips = camtravelLocalGetTrips();
+    let reservations = [];
+    try { reservations = JSON.parse(localStorage.getItem(CAMTRAVEL_RESERVATIONS_KEY) || '[]'); } catch (e) {}
+    const tripToAgency = new Map(trips.map(t => [t.id, t.agencyId || t.agency_id]));
+    const revenueByAgency = new Map();
+    reservations.forEach(r => {
+      let agencyId = r.agencyId || tripToAgency.get(r.tripId);
+      if (!agencyId && r.company) {
+        const ag = agencies.find(a => a.name === r.company);
+        if (ag) agencyId = ag.id;
+      }
+      if (!agencyId) return;
+      revenueByAgency.set(agencyId, (revenueByAgency.get(agencyId) || 0) + Number(r.total || 0));
+    });
+    return agencies.map(a => {
+      const revenue = revenueByAgency.get(a.id) || 0;
+      const commissionPercent = Number(a.commission_percent) || 10;
+      const commission = Math.round(revenue * commissionPercent / 100);
+      return {
+        id: a.id, name: a.name, status: a.status || 'active', commissionPercent,
+        revenue, commission, net: revenue - commission
+      };
+    }).sort((x, y) => y.revenue - x.revenue);
+  }
+
+  if (!camtravelSupabaseReady()) return localReport();
   try {
     const [agenciesRes, tripsRes, reservationsRes] = await Promise.all([
       window.camtravelSupabase.from('agencies').select('*'),
@@ -873,13 +933,25 @@ async function camtravelGetCommissionsReport() {
     }).sort((x, y) => y.revenue - x.revenue);
   } catch (e) {
     console.warn('Impossible de calculer les commissions.', e);
-    return [];
+    return localReport();
   }
 }
 
 // ---------- REMBOURSEMENTS ----------
 async function camtravelRequestRefund(reservationId, reason) {
-  if (!camtravelSupabaseReady()) return false;
+  if (!camtravelSupabaseReady()) {
+    try {
+      const all = JSON.parse(localStorage.getItem(CAMTRAVEL_RESERVATIONS_KEY) || '[]');
+      const i = all.findIndex(r => r.id === reservationId);
+      if (i < 0) return false;
+      all[i].refundStatus = 'requested';
+      all[i].refund_status = 'requested';
+      all[i].refundReason = reason || '';
+      all[i].refund_requested_at = new Date().toISOString();
+      localStorage.setItem(CAMTRAVEL_RESERVATIONS_KEY, JSON.stringify(all));
+      return true;
+    } catch (e) { return false; }
+  }
   try {
     // Passe par une fonction RPC dédiée (voir supabase-schema.sql) qui
     // vérifie que la réservation appartient bien à la personne connectée
@@ -896,7 +968,17 @@ async function camtravelRequestRefund(reservationId, reason) {
 }
 
 async function camtravelSetRefundStatus(reservationId, status) {
-  if (!camtravelSupabaseReady()) return false;
+  if (!camtravelSupabaseReady()) {
+    try {
+      const all = JSON.parse(localStorage.getItem(CAMTRAVEL_RESERVATIONS_KEY) || '[]');
+      const i = all.findIndex(r => r.id === reservationId);
+      if (i < 0) return false;
+      all[i].refundStatus = status;
+      all[i].refund_status = status;
+      localStorage.setItem(CAMTRAVEL_RESERVATIONS_KEY, JSON.stringify(all));
+      return true;
+    } catch (e) { return false; }
+  }
   try {
     const { error } = await window.camtravelSupabase
       .from('reservations').update({ refund_status: status }).eq('id', reservationId);

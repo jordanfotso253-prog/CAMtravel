@@ -2119,7 +2119,14 @@ body.role-agency .stat-card:hover{
 .hero-cinematic .hero-home-content{
   position:relative; z-index:2;
   max-width:640px;
-  padding:72px 48px;
+  padding:40px 36px;
+  margin:24px 48px;
+  background:rgba(4,18,13,0.42);
+  backdrop-filter:blur(18px) saturate(1.2);
+  -webkit-backdrop-filter:blur(18px) saturate(1.2);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:20px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.25);
 }
 .hero-trust{
   display:flex; flex-wrap:wrap; gap:10px 18px;
@@ -2180,7 +2187,7 @@ body.role-agency .stat-card:hover{
 
 @media (max-width: 640px){
   .hero-cinematic{ min-height:78vh; }
-  .hero-cinematic .hero-home-content{ padding:48px 22px; }
+  .hero-cinematic .hero-home-content{ padding:28px 20px; margin:16px 16px; }
   .photo-strip-item{ flex-basis:160px; }
   .photo-strip-item img{ height:110px; }
 }
@@ -2421,3 +2428,124 @@ body.role-agency .stat-card:hover{
 .quote-amount{font-size:26px;font-weight:800;letter-spacing:-0.02em;}
 .quote-detail{font-size:12.5px;opacity:.9;margin-top:4px;}
 .rental-tips{margin:0;padding-left:18px;font-size:13px;color:var(--gray-text);line-height:1.7;}
+
+/* =====================================================
+   HOME — glassmorphism + fond transport + footer Cameroun
+===================================================== */
+.home-body{
+  background-color:#e8f0eb;
+  background-image:
+    linear-gradient(180deg, rgba(232,240,235,0.55) 0%, rgba(245,248,246,0.72) 40%, rgba(255,252,245,0.78) 100%),
+    url('https://images.pexels.com/photos/1178448/pexels-photo-1178448.jpeg?auto=compress&cs=tinysrgb&w=1800');
+  background-size:cover;
+  background-position:center;
+  background-attachment:fixed;
+  background-repeat:no-repeat;
+}
+
+.home-body .navbar{
+  background:rgba(255,255,255,0.72);
+  backdrop-filter:blur(16px) saturate(1.2);
+  -webkit-backdrop-filter:blur(16px) saturate(1.2);
+  border-bottom:1px solid rgba(255,255,255,0.45);
+  box-shadow:0 4px 24px rgba(11,92,61,0.06);
+}
+
+.home-section{
+  background:transparent;
+  position:relative;
+}
+.home-section-alt{
+  background:transparent;
+}
+.home-section-inner{
+  background:rgba(255,255,255,0.55);
+  backdrop-filter:blur(18px) saturate(1.25);
+  -webkit-backdrop-filter:blur(18px) saturate(1.25);
+  border:1px solid rgba(255,255,255,0.65);
+  border-radius:22px;
+  padding:36px 32px;
+  box-shadow:
+    0 8px 32px rgba(11,92,61,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.7);
+}
+
+.step-card,
+.route-card,
+.about-grid > div,
+.feature-card{
+  background:rgba(255,255,255,0.62) !important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.7) !important;
+  box-shadow:0 6px 20px rgba(11,92,61,0.06);
+}
+
+.home-section-alt .step-card{
+  background:rgba(255,255,255,0.68) !important;
+}
+
+.photo-strip{
+  background:rgba(255,255,255,0.45);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,0.5);
+}
+
+.stats-bar{
+  background:linear-gradient(90deg, rgba(11,92,61,0.88), rgba(20,122,82,0.85));
+  backdrop-filter:blur(10px);
+}
+
+.home-cta-band{
+  background:linear-gradient(135deg, rgba(11,92,61,0.88), rgba(245,146,27,0.75)) !important;
+  backdrop-filter:blur(12px);
+  border-radius:0;
+}
+
+/* Footer — couleurs Cameroun douces (vert / rouge / jaune, pas trop foncé) */
+.home-body .site-footer,
+.site-footer{
+  position:relative;
+  background:
+    linear-gradient(90deg,
+      rgba(11,92,61,0.10) 0%,
+      rgba(206,17,38,0.06) 50%,
+      rgba(252,209,22,0.12) 100%),
+    rgba(255,255,255,0.82);
+  backdrop-filter:blur(16px) saturate(1.15);
+  -webkit-backdrop-filter:blur(16px) saturate(1.15);
+  border-top:1px solid rgba(11,92,61,0.12);
+  padding:28px 48px;
+  box-shadow:0 -4px 24px rgba(11,92,61,0.05);
+}
+.home-body .site-footer::before,
+.site-footer::before{
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:4px;
+  background:linear-gradient(90deg,
+    #0b5c3d 0%, #0b5c3d 33.33%,
+    #ce1126 33.33%, #ce1126 66.66%,
+    #fcd116 66.66%, #fcd116 100%);
+  opacity:0.85;
+}
+.site-footer .footer-manager{
+  color:#1a2e24;
+}
+.site-footer .footer-manager strong{
+  color:#0b5c3d;
+}
+.site-footer .footer-contacts a{
+  color:#2a3d34;
+}
+.site-footer .footer-contacts a:hover{
+  color:#0b5c3d;
+}
+
+@media (max-width: 900px){
+  .home-body{ background-attachment:scroll; }
+  .home-section-inner{ padding:28px 18px; border-radius:16px; }
+  .site-footer{ padding:22px 20px; }
+}
