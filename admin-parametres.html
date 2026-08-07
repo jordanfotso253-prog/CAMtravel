@@ -62,6 +62,20 @@
       Ces préférences s’appliquent à votre session administrateur sur cet appareil.
     </p>
 
+    <div class="profile-card" style="max-width:600px; margin-bottom:18px;">
+      <div class="role-profile-head">
+        <div class="role-profile-avatar"><span id="roleAvatarInitials">AD</span><img id="roleAvatarImage" alt="Avatar administrateur"></div>
+        <label class="avatar-edit-btn" for="roleAvatarInput" title="Changer la photo de profil">Photo</label>
+        <input type="file" accept="image/*" id="roleAvatarInput" style="display:none;">
+      </div>
+      <form id="roleProfileForm">
+        <div class="field"><label for="roleProfileName">Nom</label><div class="input-wrap"><input id="roleProfileName" type="text" placeholder="Nom administrateur"></div></div>
+        <div class="field"><label for="roleProfileTel">Téléphone</label><div class="input-wrap"><input id="roleProfileTel" type="tel" placeholder="Téléphone"></div></div>
+        <div class="field"><label for="roleProfileVille">Ville</label><div class="input-wrap"><input id="roleProfileVille" type="text" placeholder="Ville"></div></div>
+        <button type="submit" class="btn-primary" style="width:auto;padding:11px 20px;">Enregistrer le profil</button>
+      </form>
+    </div>
+
     <div class="profile-card">
       <h3 style="margin:0 0 4px;" data-i18n="settings.prefs">Préférences</h3>
       <div class="settings-row">
@@ -69,7 +83,7 @@
           <div class="s-title" data-i18n="settings.lang">Langue</div>
           <div class="s-sub" data-i18n="settings.lang.sub">Langue d'affichage du site</div>
         </div>
-        <select class="select-input" id="langSelect" style="width:auto; padding:8px 12px;">
+        <select class="select-input" id="langSelect" aria-label="Langue" style="width:auto; padding:8px 12px;">
           <option value="fr">Français</option>
           <option value="en">English</option>
         </select>
@@ -79,7 +93,7 @@
           <div class="s-title" data-i18n="settings.theme">Thème</div>
           <div class="s-sub" data-i18n="settings.theme.sub">Apparence claire ou sombre</div>
         </div>
-        <select class="select-input" id="themeSelect" style="width:auto; padding:8px 12px;">
+        <select class="select-input" id="themeSelect" aria-label="Thème" style="width:auto; padding:8px 12px;">
           <option value="light">Clair</option>
           <option value="dark">Sombre</option>
         </select>
@@ -101,6 +115,7 @@
 <script src="js/notifications-store.js"></script>
 <script src="js/push-notifications.js"></script>
 <script src="js/admin-guard.js"></script>
+<script src="js/role-profile.js"></script>
 <script src="js/script-parametres.js"></script>
 <script src="js/chatbot.js"></script>
 <script>

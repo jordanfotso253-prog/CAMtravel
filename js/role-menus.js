@@ -35,6 +35,39 @@
     if (!nav || nav.dataset.toggleMenusReady === 'true') return;
     nav.dataset.toggleMenusReady = 'true';
 
+    const sidebar = nav.closest('.sidebar');
+    if (sidebar && !document.querySelector('.sidebar-toggle')) {
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'sidebar-toggle';
+      toggle.setAttribute('aria-label', 'Ouvrir le menu');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.innerHTML = '<span></span><span></span><span></span>';
+      const backdrop = document.createElement('button');
+      backdrop.type = 'button';
+      backdrop.className = 'sidebar-backdrop';
+      backdrop.setAttribute('aria-label', 'Fermer le menu');
+      document.body.append(toggle, backdrop);
+
+      const close = () => {
+        sidebar.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Ouvrir le menu');
+      };
+      toggle.addEventListener('click', () => {
+        const open = sidebar.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
+      });
+      backdrop.addEventListener('click', close);
+      nav.addEventListener('click', event => {
+        if (event.target.closest('a')) close();
+      });
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 760) close();
+      });
+    }
+
     const anchors = Array.from(nav.children).filter(child => child.tagName === 'A');
     const dashboard = anchors.find(a => /dashboard\.html/i.test(a.getAttribute('href') || ''));
     const groups = new Map();

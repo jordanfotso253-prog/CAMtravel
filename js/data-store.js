@@ -596,6 +596,7 @@ async function camtravelGetMyAgency() {
           ville: found.ville,
           commission_percent: found.commission_percent || 10,
           status: found.status || 'active',
+          avatarData: found.avatarData || found.avatar_data || null,
           role: sess.role || 'agence_admin'
         };
       }
@@ -619,7 +620,7 @@ async function camtravelGetMyAgency() {
     const { data, error } = await window.camtravelSupabase
       .from('agencies').select('*').ilike('email', user.email.toLowerCase()).maybeSingle();
     if (error) throw error;
-    if (data) return { ...data, role: 'agence_admin' };
+    if (data) return { ...data, avatarData: data.avatar_data || null, role: 'agence_admin' };
     return null;
   } catch (e) {
     console.warn('Supabase indisponible pour charger l\'agence.', e);
@@ -664,6 +665,25 @@ function camtravelAgencyLogoutLocal() {
 function camtravelGetAgencySession() {
   try { return JSON.parse(localStorage.getItem(CAMTRAVEL_AGENCY_SESSION) || 'null'); }
   catch (e) { return null; }
+}
+
+async function camtravelUpdateMyAgency(fields) {
+  if (!camtravelSupabaseReady()) return { ok: false, mode: 'supabase' };
+  const agency = await camtravelGetMyAgency();
+  if (!agency || !agency.id) return { ok: false, mode: 'supabase' };
+  try {
+    const { error } = await window.camtravelSupabase.from('agencies').update({
+      name: fields.name,
+      tel: fields.tel,
+      ville: fields.ville,
+      avatar_data: fields.avatarData || null
+    }).eq('id', agency.id);
+    if (error) throw error;
+    return { ok: true, mode: 'supabase' };
+  } catch (e) {
+    console.warn("Impossible d'enregistrer le profil agence.", e);
+    return { ok: false, mode: 'supabase' };
+  }
 }
 
 

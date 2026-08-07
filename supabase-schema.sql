@@ -115,6 +115,8 @@ create table if not exists public.agencies (
   status text not null default 'active', -- 'active' | 'suspended'
   created_at timestamptz not null default now()
 );
+-- Photo de profil de l'agence, stockée en base64 comme celle du client.
+alter table public.agencies add column if not exists avatar_data text;
 
 -- ---------- TRAJETS RÉELS PROPOSÉS PAR LES AGENCES ----------
 -- Remplace le tableau de trajets qui était codé en dur dans
