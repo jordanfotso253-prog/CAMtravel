@@ -477,7 +477,7 @@ async function camtravelIsAdminEmail(email) {
   if (camtravelSupabaseReady()) {
     try {
       const { data, error } = await window.camtravelSupabase
-        .from('admins').select('is_admin').eq('email', cleanEmail).maybeSingle();
+        .from('admins').select('is_admin').ilike('email', cleanEmail).maybeSingle();
       if (error) throw error;
       return !!(data && data.is_admin);
     } catch (e) {
@@ -617,7 +617,7 @@ async function camtravelGetMyAgency() {
   if (!user || !user.email) return null;
   try {
     const { data, error } = await window.camtravelSupabase
-      .from('agencies').select('*').eq('email', user.email.toLowerCase()).maybeSingle();
+      .from('agencies').select('*').ilike('email', user.email.toLowerCase()).maybeSingle();
     if (error) throw error;
     if (data) return { ...data, role: 'agence_admin' };
     return null;

@@ -14,13 +14,6 @@ function setError(fieldId, hasError) {
   if (el) el.classList.toggle('error', hasError);
 }
 
-/** Tente une connexion agence locale (comptes démo / hors-ligne). */
-function tryAgencyLocalLogin(email, password) {
-  if (typeof camtravelAgencyLoginLocal !== 'function') return null;
-  const result = camtravelAgencyLoginLocal(email, password);
-  return result && result.ok ? result : null;
-}
-
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   let valid = true;
@@ -37,17 +30,7 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
-  // 1) Comptes agence locaux en priorité (démo / hors-ligne)
-  //    → fonctionne même si Supabase est configuré
-  const agLogin = tryAgencyLocalLogin(identifiant, pass);
-  if (agLogin) {
-    banner.className = 'status-banner show success';
-    banner.textContent = 'Espace agence « ' + (agLogin.agency.name || '') + ' » — redirection...';
-    setTimeout(() => { window.location.href = 'agency-dashboard.html'; }, 900);
-    return;
-  }
-
-  // 2) Supabase (admin, client, ou agence enregistrée en base)
+  // Les comptes client, admin et agence sont vérifiés par Supabase.
   if (window.CAMTRAVEL_SUPABASE_ENABLED && window.camtravelSupabase) {
     banner.className = 'status-banner show success';
     banner.textContent = "Connexion en cours...";
@@ -58,17 +41,22 @@ form.addEventListener('submit', async (e) => {
       });
       if (error) throw error;
 
-      // Après auth Supabase : résoudre le rôle
+      // Après auth Supabase : résoudre le rôle.
+      // Utiliser l'email du compte connecté pour éviter les différences de casse.
       let destination = 'dashboard.html';
       try {
-        if (typeof camtravelIsAdminEmail === 'function' && await camtravelIsAdminEmail(identifiant)) {
+        const currentUser = typeof camtravelGetCurrentUser === 'function'
+          ? await camtravelGetCurrentUser()
+          : null;
+        const email = (currentUser && currentUser.email) ? currentUser.email : identifiant;
+        if (typeof camtravelIsAdminEmail === 'function' && await camtravelIsAdminEmail(email)) {
           destination = 'admin-dashboard.html';
         } else {
           const agency = typeof camtravelGetMyAgency === 'function' ? await camtravelGetMyAgency() : null;
-          if (agency) {
+          if (agency && agency.id) {
             try {
               localStorage.setItem('camtravel_agency_session', JSON.stringify({
-                email: (identifiant || '').toLowerCase(),
+                email: (email || '').toLowerCase(),
                 agency_id: agency.id,
                 name: agency.name,
                 role: 'agence_admin'
@@ -93,8 +81,6 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
-  // 3) Mode démo pur (pas de Supabase) : client
-  banner.className = 'status-banner show success';
-  banner.textContent = "Connexion réussie (mode démo — configurez Supabase pour une vraie vérification du mot de passe). Redirection...";
-  setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+  banner.className = 'status-banner show error';
+  banner.textContent = "Connexion indisponible : configurez Supabase pour utiliser un compte réel.";
 });

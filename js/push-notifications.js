@@ -101,23 +101,17 @@
     } catch (e) {}
 
     try {
-      const reg = await navigator.serviceWorker.getRegistration();
-      if (reg && reg.active) {
-        reg.active.postMessage({
-          type: 'SHOW_NOTIFICATION',
-          title, body, url, tag
+      const reg = await navigator.serviceWorker.ready;
+      if (reg && reg.showNotification) {
+        await reg.showNotification(title, {
+          body,
+          icon: './assets/logo.svg',
+          badge: './assets/logo.svg',
+          tag,
+          renotify: true,
+          vibrate: [120, 60, 120],
+          data: { url }
         });
-        // Aussi tenter showNotification depuis la page si SW pas encore actif
-        if (reg.showNotification) {
-          await reg.showNotification(title, {
-            body,
-            icon: 'assets/logo.svg',
-            tag,
-            renotify: true,
-            vibrate: [120, 60, 120],
-            data: { url }
-          });
-        }
         return { ok: true, via: 'service-worker' };
       }
     } catch (e) {
@@ -128,7 +122,7 @@
     try {
       const n = new Notification(title, {
         body,
-        icon: 'assets/logo.svg',
+        icon: './assets/logo.svg',
         tag,
         data: { url }
       });

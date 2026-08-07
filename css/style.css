@@ -264,6 +264,11 @@ body{
 .btn-primary:active{ transform:translateY(1px); }
 .btn-primary:disabled{ background:#9fb8ad; cursor:not-allowed; }
 
+/* La navigation client utilise les reservations comme point d'entree unique. */
+.sidebar-nav a[href="mes-trajets.html"],
+.quick-actions a[href="mes-trajets.html"],
+.stat-card a[href="mes-trajets.html"]{ display:none !important; }
+
 .divider{
   display:flex;
   align-items:center;
@@ -312,11 +317,13 @@ body{
 .status-banner.error{ background:#fdecec; color:#c62b2b; border:1px solid #f3c2c2; }
 
 @media (max-width: 880px){
-  .page{ flex-direction:column; }
-  .hero{ min-height:340px; padding:28px 26px 26px; }
+  .page{ display:block; min-height:100vh; }
+  .hero{ min-height:300px; padding:28px 26px 26px; }
   .hero-mid{ padding-bottom:20px; }
   .features{ display:none; }
-  .form-wrap{ clip-path:none; margin-left:0; padding:34px 22px 40px; }
+  .form-wrap{ width:100%; clip-path:none; margin-left:0; padding:34px 22px 40px; overflow:visible; }
+  .form-inner{ max-width:560px; margin:0 auto; }
+  .form-inner .btn-primary{ display:block; min-height:48px; visibility:visible; opacity:1; }
   .row{ flex-direction:column; gap:0; }
 }
 
@@ -620,6 +627,50 @@ body{
   transition:background .15s ease;
 }
 .quick-actions a:hover{ background:var(--green-dark); }
+
+/* Menus de navigation par role */
+.sidebar-group{ margin:0; }
+.sidebar-group summary{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  list-style:none;
+  padding:11px 18px;
+  color:rgba(255,255,255,.78);
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  border-radius:8px;
+}
+.sidebar-group summary::-webkit-details-marker{ display:none; }
+.sidebar-group summary::after{
+  content:'+';
+  margin-left:auto;
+  font-size:18px;
+  font-weight:400;
+  line-height:1;
+}
+.sidebar-group[open] summary::after{ content:'−'; }
+.sidebar-group summary:hover{ color:#fff; background:rgba(255,255,255,.08); }
+.sidebar-subnav{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  margin:2px 0 6px 18px;
+  padding-left:12px;
+  border-left:1px solid rgba(255,255,255,.18);
+}
+.sidebar-subnav a{
+  display:block;
+  padding:8px 12px;
+  color:rgba(255,255,255,.68);
+  font-size:12px;
+  text-decoration:none;
+  border-radius:7px;
+}
+.sidebar-subnav a:hover,
+.sidebar-subnav a.active{ color:#fff; background:rgba(255,255,255,.1); }
+.sidebar-subnav a.active{ box-shadow:inset 2px 0 var(--orange); }
 
 @media (max-width: 1000px){
   .stat-cards{ grid-template-columns:repeat(2,1fr); }

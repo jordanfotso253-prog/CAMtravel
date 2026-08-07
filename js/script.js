@@ -59,8 +59,7 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
-  // Crée le compte : avec un vrai mot de passe vérifié si Supabase est
-  // configuré, sinon en mode démonstration (comme avant).
+  // Crée le compte avec un mot de passe vérifié et stocké par Supabase Auth.
   banner.className = 'status-banner show success';
   banner.textContent = "Création du compte en cours...";
 
@@ -91,11 +90,6 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
-  // Mode démonstration (Supabase non configuré) : pas de vraie vérification de mot de passe.
-  if (typeof camtravelSaveUser === 'function') {
-    await camtravelSaveUser({ nom, tel, email, ville });
-  }
-  banner.className = 'status-banner show success';
-  banner.textContent = "Compte créé avec succès pour " + nom + " ! (mode démo — configurez Supabase pour un vrai mot de passe sécurisé). Vous pouvez maintenant vous connecter.";
-  form.reset();
+  banner.className = 'status-banner show error';
+  banner.textContent = "Inscription indisponible : configurez Supabase pour créer un compte réel.";
 });

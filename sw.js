@@ -2,7 +2,7 @@
  * CAM travel — Service Worker
  * Gère les notifications push / locales sur mobile et desktop.
  */
-const CACHE = 'camtravel-v1';
+const CACHE = 'camtravel-v2';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
