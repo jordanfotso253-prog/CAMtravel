@@ -2,6 +2,16 @@ const form = document.getElementById('verifyForm');
 const resultBox = document.getElementById('resultBox');
 const refInput = document.getElementById('refInput');
 
+const role = new URLSearchParams(window.location.search).get('role');
+const verifyBackLink = document.getElementById('verifyBackLink');
+if (role === 'admin') {
+  document.body.className = 'role-admin';
+  if (verifyBackLink) verifyBackLink.href = 'admin-dashboard.html';
+} else if (role === 'agency') {
+  document.body.className = 'role-agency';
+  if (verifyBackLink) verifyBackLink.href = 'agency-dashboard.html';
+}
+
 function formatDateFr(iso) {
   const d = new Date(iso);
   if (isNaN(d)) return iso;
@@ -76,3 +86,9 @@ form.addEventListener('submit', (e) => {
   if (!ref) return;
   verifyRef(ref);
 });
+
+const initialRef = new URLSearchParams(window.location.search).get('ref');
+if (initialRef) {
+  refInput.value = initialRef;
+  verifyRef(initialRef);
+}

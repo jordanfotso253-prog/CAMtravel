@@ -5,6 +5,13 @@
  *
  */
 (async function () {
+  // En mode local, une connexion agence valide est portée par cette session.
+  try {
+    const localSession = JSON.parse(localStorage.getItem('camtravel_agency_session') || 'null');
+    if (localSession && localSession.agency_id) return;
+  } catch (e) {
+  }
+
   if (!window.CAMTRAVEL_SUPABASE_ENABLED || !window.camtravelSupabase) {
     window.location.href = 'connexion.html?role=agence';
     return;

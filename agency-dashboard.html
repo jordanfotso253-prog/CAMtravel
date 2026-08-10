@@ -33,7 +33,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16"/></svg>
         Réservations
       </a>
-      <a href="verify-ticket.html">
+      <a href="verify-ticket.html?role=agency">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3 4-3 9-3 9 1.34 9 3z"/><path d="M3 12v6c0 1.66 4 3 9 3s9-1.34 9-3v-6"/></svg>
         Vérifier ticket
       </a>
@@ -69,12 +69,20 @@
 
     <div class="status-banner" id="statusBanner"></div>
 
+    <div class="panel anim-fade-up" style="margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;">
+      <div>
+        <h3 style="margin:0 0 4px;">Vérification de ticket</h3>
+        <p style="margin:0; color:var(--gray-text); font-size:13px;">Validez rapidement le ticket d'un passager.</p>
+      </div>
+      <form action="verify-ticket.html" method="get" style="display:flex; gap:8px; flex-wrap:wrap; margin:0;">
+        <input type="hidden" name="role" value="agency">
+        <input type="text" name="ref" placeholder="Matricule / référence du ticket" maxlength="12" aria-label="Matricule ou référence du ticket" required style="width:min(260px, 100%); padding:10px 12px;">
+        <button type="submit" class="btn-primary" style="width:auto; padding:10px 16px;">Vérifier</button>
+      </form>
+    </div>
+
     
     <div class="panel" style="margin-bottom:16px;padding:12px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;">
-      <div style="font-size:13px;color:var(--gray-text);">
-        <span id="agencyIdLine">Agence</span>
-        · Base unique CAM travel · données filtrées par <code>agency_id</code>
-      </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <label for="locationFilter" style="font-size:13px;font-weight:600;">Lieu</label>
         <select id="locationFilter" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;">

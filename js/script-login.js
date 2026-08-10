@@ -30,6 +30,18 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
+  // Les comptes agence de démonstration doivent rester accessibles même
+  // lorsque Supabase est configuré pour les comptes de production.
+  if (typeof camtravelAgencyLoginLocal === 'function') {
+    const localAgency = camtravelAgencyLoginLocal(identifiant, pass);
+    if (localAgency.ok) {
+      banner.className = 'status-banner show success';
+      banner.textContent = "Connexion réussie ! Redirection vers votre espace agence...";
+      setTimeout(() => { window.location.href = 'agency-dashboard.html'; }, 500);
+      return;
+    }
+  }
+
   // Les comptes client, admin et agence sont vérifiés par Supabase.
   if (window.CAMTRAVEL_SUPABASE_ENABLED && window.camtravelSupabase) {
     banner.className = 'status-banner show success';
@@ -82,5 +94,5 @@ form.addEventListener('submit', async (e) => {
   }
 
   banner.className = 'status-banner show error';
-  banner.textContent = "Connexion indisponible : configurez Supabase pour utiliser un compte réel.";
+  banner.textContent = "Email ou mot de passe incorrect, ou configurez Supabase pour utiliser un compte réel.";
 });

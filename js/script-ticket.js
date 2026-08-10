@@ -7,6 +7,10 @@ const date = params.get('date') || '2024-06-08';
 const ref = params.get('ref') || 'YA001250608';
 const passagerNom = params.get('passagerNom') || 'Jean Dupont';
 const passagerTel = params.get('passagerTel') || '6 96 74 53 24';
+const seats = (params.get('seats') || '').split(',').map(s => s.trim()).filter(Boolean);
+const passagers = Number(params.get('passagers') || seats.length || 1);
+const price = Number(params.get('price') || 0);
+const total = Number(params.get('total') || price * passagers);
 
 function formatDate(iso) {
   const d = new Date(iso);
@@ -28,10 +32,12 @@ document.getElementById('tRoute').textContent = `${from} → ${to}`;
 document.getElementById('tDateTime').textContent = `${formatDate(date)} - ${dep}`;
 document.getElementById('tPassager').textContent = passagerNom;
 document.getElementById('tTel').textContent = passagerTel;
-document.getElementById('tSiege').textContent = seatFromRef(ref);
+document.getElementById('tSiege').textContent = seats.length ? seats.join(' · ') : seatFromRef(ref);
+document.getElementById('tUnitPrice').textContent = `${price.toLocaleString('fr-FR')} FCFA`;
+document.getElementById('tTotal').textContent = `${total.toLocaleString('fr-FR')} FCFA`;
 
 // Génération du QR code : encode les infos essentielles du ticket
-const qrData = JSON.stringify({ ref, from, to, date, dep, passager: passagerNom });
+const qrData = JSON.stringify({ ref, from, to, date, dep, seats, total, passager: passagerNom });
 
 if (window.QRCode) {
   new QRCode(document.getElementById('qrcode'), {

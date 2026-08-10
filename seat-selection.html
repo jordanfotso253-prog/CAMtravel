@@ -10,7 +10,7 @@
 <script src="js/theme.js"></script>
 <script src="js/i18n.js"></script>
 </head>
-<body>
+<body class="seat-selection-page">
 
   <!-- TOP BAR -->
   <div class="search-topbar">
@@ -43,24 +43,33 @@
 
   <div class="passenger-wrap">
     <div class="passenger-card">
-      <h2>Choisissez vos sièges</h2>
-      <p id="tripSummary" style="margin:-12px 0 22px; font-size:13px; color:var(--gray-text);"></p>
+      <div class="seat-page-heading">
+        <div>
+          <span class="eyebrow">ÉTAPE 03</span>
+          <h2>Choisissez vos sièges</h2>
+          <p class="seat-help">Sélectionnez une ou plusieurs places disponibles dans le bus.</p>
+        </div>
+        <div class="seat-count-badge"><strong id="availableSeatLabel">--</strong><span>places libres</span></div>
+      </div>
+      <div class="trip-summary" id="tripSummary"></div>
 
       <div class="status-banner" id="statusBanner"></div>
 
-      <div class="seat-front">🚌 Avant du bus</div>
-      <div class="seat-map" id="seatMap"></div>
+      <div class="seat-map-shell">
+        <div class="seat-map" id="seatMap"></div>
+      </div>
 
       <div class="seat-legend">
-        <span><span class="dot" style="background:#fff; border:1.5px solid var(--border);"></span>Libre</span>
-        <span><span class="dot" style="background:var(--green-deep);"></span>Sélectionné</span>
-        <span><span class="dot" style="background:#f1f2f1;"></span>Occupé</span>
+        <span><span class="dot available"></span>Libre</span>
+        <span><span class="dot selected"></span>Sélectionné</span>
+        <span><span class="dot occupied"></span>Occupé</span>
       </div>
 
       <div class="seat-summary-bar">
         <div>
-          <div class="label" style="font-size:12px; color:var(--gray-text);" id="seatCountLabel">0 siège sélectionné</div>
-          <div class="value" style="font-size:18px; font-weight:700; color:var(--ink);" id="totalPriceLabel">0 FCFA</div>
+          <div class="label" id="seatCountLabel">Aucun siège sélectionné</div>
+          <div class="seat-unit-price" id="seatUnitPriceLabel">0 FCFA / siège</div>
+          <div class="value" id="totalPriceLabel">0 FCFA</div>
         </div>
         <button type="button" class="btn-primary" id="continueBtn" style="width:auto; padding:13px 28px;" disabled>Continuer</button>
       </div>

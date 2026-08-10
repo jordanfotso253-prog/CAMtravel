@@ -34,7 +34,9 @@ document.getElementById('tripSummary').textContent = summaryParts.join(' · ');
 
 const seatMap = document.getElementById('seatMap');
 const seatCountLabel = document.getElementById('seatCountLabel');
+const seatUnitPriceLabel = document.getElementById('seatUnitPriceLabel');
 const totalPriceLabel = document.getElementById('totalPriceLabel');
+const availableSeatLabel = document.getElementById('availableSeatLabel');
 const continueBtn = document.getElementById('continueBtn');
 const banner = document.getElementById('statusBanner');
 const selectedSeats = new Set();
@@ -73,6 +75,7 @@ function renderSummary() {
     ? 'Aucun siège sélectionné'
     : `${n} siège${n > 1 ? 's' : ''} : ${[...selectedSeats].join(', ')}`;
   totalPriceLabel.textContent = `${(n * price).toLocaleString('fr-FR')} FCFA`;
+  if (seatUnitPriceLabel) seatUnitPriceLabel.textContent = `${price.toLocaleString('fr-FR')} FCFA / siège`;
   continueBtn.disabled = n === 0;
 }
 
@@ -80,6 +83,7 @@ function buildSeatMap(occupied) {
   occupied = (occupied || []).map(String);
   const layout = resolveLayout();
   seatCount = layout.seatCount || seatCount;
+  if (availableSeatLabel) availableSeatLabel.textContent = Math.max(0, seatCount - occupied.length);
   seatMap.innerHTML = '';
   seatMap.classList.add('bus-seat-map');
 

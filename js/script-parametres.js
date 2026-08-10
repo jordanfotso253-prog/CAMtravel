@@ -57,6 +57,26 @@ if (themeSelect) {
   });
 }
 
+// ---- Palette de couleurs client ----
+const paletteOptions = document.querySelectorAll('[data-palette]');
+if (paletteOptions.length && typeof camtravelGetPalette === 'function') {
+  function refreshPaletteSelection() {
+    const selected = camtravelGetPalette();
+    paletteOptions.forEach(option => {
+      option.classList.toggle('is-selected', option.dataset.palette === selected);
+      option.setAttribute('aria-pressed', option.dataset.palette === selected ? 'true' : 'false');
+    });
+  }
+  refreshPaletteSelection();
+  paletteOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      camtravelSetPalette(option.dataset.palette);
+      refreshPaletteSelection();
+      showSaved();
+    });
+  });
+}
+
 const deleteBtn = document.getElementById('deleteAccountBtn');
 if (deleteBtn) {
   deleteBtn.addEventListener('click', async () => {
