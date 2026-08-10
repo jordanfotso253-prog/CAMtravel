@@ -109,7 +109,8 @@
           ['admin-parametres.html', 'Profil', '<circle cx="12" cy="8" r="3"/><path d="M5 21a7 7 0 0 1 14 0"/>'],
           ['admin-users.html', 'Utilisateurs', '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>'],
           ['agencies.html', 'Agences', '<path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M8 10h.01M12 10h.01M16 10h.01"/>'],
-          ['notifications.html?role=admin', 'Alertes', '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>']
+          ['notifications.html?role=admin', 'Alertes', '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>'],
+          ['#logout', 'Sortir', '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/>']
         ]
       : role === 'agency'
       ? [
@@ -117,14 +118,16 @@
           ['agency-parametres.html', 'Profil', '<circle cx="12" cy="8" r="3"/><path d="M5 21a7 7 0 0 1 14 0"/>'],
           ['agency-staff.html', 'Équipe', '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>'],
           ['agency-locations.html', 'Lieux', '<path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>'],
-          ['notifications.html?role=agency', 'Alertes', '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>']
+          ['notifications.html?role=agency', 'Alertes', '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>'],
+          ['#logout', 'Sortir', '<path d="M9 21H5a2 2 0 0 1 2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/>']
         ]
       : [
           ['dashboard.html', 'Accueil', '<path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/>'],
           ['profil.html', 'Profil', '<circle cx="12" cy="8" r="3"/><path d="M5 21a7 7 0 0 1 14 0"/>'],
           ['mes-reservations.html', 'Billets', '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/>'],
           ['tracking.html', 'Localiser', '<path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>'],
-          ['notifications.html', 'Alertes', '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>']
+          ['notifications.html', 'Alertes', '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>'],
+          ['#logout', 'Sortir', '<path d="M9 21H5a2 2 0 0 1 2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/>']
         ];
     const nav = document.createElement('nav');
     nav.className = 'mobile-bottom-nav';
@@ -135,6 +138,13 @@
       link.href = href;
       link.className = current === href.split('?')[0] ? 'is-active' : '';
       link.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">${icon}</svg><span>${label}</span>`;
+      if (href === '#logout') {
+        link.href = '#';
+        link.addEventListener('click', event => {
+          event.preventDefault();
+          if (typeof window.camtravelLogout === 'function') window.camtravelLogout(event);
+        });
+      }
       nav.appendChild(link);
     });
     document.body.appendChild(nav);

@@ -55,6 +55,35 @@ const CHATBOT_KB = [
     keywords: ['merci'],
     reply: "Avec plaisir ! Bon voyage avec CAM travel 🚌",
   },
+  {
+    keywords: ['agence', 'agences', 'partenaire'],
+    reply: "Vous êtes dans l'espace agence ? Je peux vous orienter vers vos trajets, vos lieux, votre équipe, vos réservations ou la vérification d'un ticket.",
+    quick: [
+      { label: 'Mes trajets', url: 'agency-dashboard.html#trips' },
+      { label: 'Mes lieux', url: 'agency-locations.html' },
+      { label: 'Mon équipe', url: 'agency-staff.html' },
+      { label: 'Vérifier un ticket', url: 'verify-ticket.html?role=agency' }
+    ]
+  },
+  {
+    keywords: ['admin', 'administrateur', 'utilisateur', 'utilisateurs'],
+    reply: "Je peux vous aider à retrouver la gestion des utilisateurs, des agences, des trajets, des tickets et des notifications administrateur.",
+    quick: [
+      { label: 'Utilisateurs', url: 'admin-users.html' },
+      { label: 'Agences', url: 'agencies.html' },
+      { label: 'Vérifier un ticket', url: 'verify-ticket.html?role=admin' }
+    ]
+  },
+  {
+    keywords: ['localisation', 'localiser', 'gps', 'suivi'],
+    reply: "Pour suivre un trajet, ouvrez la page de suivi GPS. Côté agence, vous pouvez aussi gérer vos lieux et gares.",
+    quick: [{ label: 'Suivi GPS', url: 'tracking.html' }, { label: 'Mes lieux agence', url: 'agency-locations.html' }]
+  },
+  {
+    keywords: ['notification', 'notifications', 'alerte', 'alertes'],
+    reply: "Vous pouvez consulter vos alertes et notifications depuis votre espace. Je peux ouvrir la page correspondante.",
+    quick: [{ label: 'Voir les notifications', url: 'notifications.html' }]
+  },
 ];
 
 // Petit quiz pour divertir le client pendant qu'il patiente
@@ -100,7 +129,19 @@ function chatbotWhatsappLink(prefill) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(prefill)}`;
 }
 
+function chatbotNeedsClientLogin(role, url) {
+  const page = window.location.pathname.split('/').pop() || 'index.html';
+  if (role !== 'client' || page !== 'index.html') return false;
+  return url && !/^connexion\.html|^inscription\.html/.test(url);
+}
+
+function chatbotLoginUrl(url) {
+  return `connexion.html?redirect=${encodeURIComponent(url)}`;
+}
+
 function chatbotInit() {
+  const role = document.body.classList.contains('role-admin') ? 'admin'
+    : document.body.classList.contains('role-agency') ? 'agency' : 'client';
   const bubble = document.createElement('button');
   bubble.className = 'chatbot-bubble';
   bubble.setAttribute('aria-label', 'Assistance CAM travel');
@@ -117,7 +158,7 @@ function chatbotInit() {
     <div class="chatbot-header">
       <div>
         <div class="title">Assistant CAM travel</div>
-        <div class="subtitle">Généralement en ligne</div>
+        <div class="subtitle">${role === 'admin' ? 'Aide administrateur' : role === 'agency' ? 'Aide agence' : 'Généralement en ligne'}</div>
       </div>
       <button class="chatbot-close" aria-label="Fermer">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -165,7 +206,9 @@ function chatbotInit() {
         } else if (q.ask) {
           handleUserMessage(q.ask);
         } else {
-          window.location.href = q.url;
+          window.location.href = chatbotNeedsClientLogin(role, q.url)
+            ? chatbotLoginUrl(q.url)
+            : q.url;
         }
       });
       wrap.appendChild(btn);
@@ -260,11 +303,18 @@ function chatbotInit() {
   bubble.addEventListener('click', () => {
     panel.classList.add('open');
     if (messagesEl.children.length === 0) {
-      addMessage("Bonjour 👋 Je suis l'assistant CAM travel. Posez-moi une question sur les horaires, tarifs, réservations ou colis !", 'bot');
+      const intro = role === 'admin'
+        ? "Bonjour 👋 Je peux vous aider avec les utilisateurs, agences, tickets et notifications."
+        : role === 'agency'
+          ? "Bonjour 👋 Je peux vous aider avec vos trajets, lieux, équipe, réservations et tickets."
+          : "Bonjour 👋 Je peux vous aider avec les horaires, tarifs, réservations, colis et notifications !";
+      addMessage(intro, 'bot');
       addQuickReplies([
         { label: 'Horaires', ask: 'horaires' },
         { label: 'Tarifs colis', url: 'colis.html' },
         { label: 'Réserver un trajet', url: 'recherche.html' },
+        ...(role === 'agency' ? [{ label: 'Vérifier un ticket', url: 'verify-ticket.html?role=agency' }] : []),
+        ...(role === 'admin' ? [{ label: 'Vérifier un ticket', url: 'verify-ticket.html?role=admin' }] : []),
         { label: '🎮 Jouer au Quiz', startQuiz: true },
       ]);
     }

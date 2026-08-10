@@ -79,6 +79,11 @@ form.addEventListener('submit', async (e) => {
         }
       } catch (e) { /* en cas de doute → dashboard client */ }
 
+      const redirect = new URLSearchParams(window.location.search).get('redirect');
+      if (destination === 'dashboard.html' && redirect && /^[a-z0-9/_#?.=&%-]+\.html(?:[#?].*)?$/i.test(redirect)) {
+        destination = redirect;
+      }
+
       banner.textContent = "Connexion réussie ! Redirection vers votre tableau de bord...";
       setTimeout(() => { window.location.href = destination; }, 1000);
     } catch (err) {

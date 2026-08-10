@@ -1976,7 +1976,7 @@ html[data-theme="dark"] .ticket-status{ background:rgba(52,211,117,.2); color:#7
     bottom:0;
     z-index:120;
     display:grid;
-    grid-template-columns:repeat(5,1fr);
+    grid-template-columns:repeat(6,1fr);
     min-height:66px;
     padding:7px 8px calc(7px + env(safe-area-inset-bottom));
     background:var(--surface);
@@ -1992,13 +1992,27 @@ html[data-theme="dark"] .ticket-status{ background:rgba(52,211,117,.2); color:#7
     min-width:0;
     color:var(--gray-text);
     text-decoration:none;
-    font-size:10px;
+    font-size:9px;
     font-weight:700;
   }
   .mobile-bottom-nav a.is-active{ color:var(--green-deep); }
   .mobile-bottom-nav a svg{ flex:0 0 auto; }
   .mobile-bottom-nav a.is-active svg{ stroke-width:2.5; }
   .dash-main{ padding-bottom:96px; }
+  .chatbot-bubble{
+    right:14px;
+    bottom:84px;
+    width:52px;
+    height:52px;
+    z-index:210;
+  }
+  .chatbot-panel{
+    right:12px;
+    bottom:146px;
+    width:min(340px, calc(100vw - 24px));
+    max-height:calc(100vh - 180px);
+    z-index:210;
+  }
 }
 
 /* =====================================================
