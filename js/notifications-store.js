@@ -20,6 +20,13 @@
     return 'N' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   }
 
+  function defaultUrlForRole(role) {
+    const normalized = (role || '').toLowerCase();
+    if (normalized === 'admin') return 'admin-dashboard.html';
+    if (normalized === 'agency') return 'agency-dashboard.html';
+    return 'dashboard.html';
+  }
+
   /**
    * @param {object} n
    * @param {string} n.title
@@ -37,7 +44,7 @@
       body: n.body || '',
       type: n.type || 'system',
       role: n.role || 'all',
-      url: n.url || 'notifications.html',
+      url: (typeof n.url === 'string' && n.url.trim()) ? n.url : defaultUrlForRole(n.role),
       userId: n.userId || null,
       read: false,
       createdAt: new Date().toISOString()
@@ -98,6 +105,7 @@
   function markRead(id) {
     const list = loadAll().map(n => n.id === id ? { ...n, read: true } : n);
     saveAll(list);
+    document.dispatchEvent(new CustomEvent('camtravel:notification', { detail: { id, action: 'markRead' } }));
   }
 
   function markAllRead(opts) {
@@ -108,6 +116,7 @@
     });
     saveAll(all);
     localStorage.setItem(SEEN_KEY, new Date().toISOString());
+    document.dispatchEvent(new CustomEvent('camtravel:notification', { detail: { action: 'markAllRead', opts } }));
   }
 
   function clearAll() {

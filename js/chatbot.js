@@ -115,6 +115,18 @@ const QUIZ_QUESTIONS = [
   },
 ];
 
+const EMERGENCY_SUPPORT_OPTIONS = [
+  { key: 'general', label: 'Problème général', recipient: 'Admin', note: 'Le problème sera aiguillé vers l’administration CAMtravel.' },
+  { key: 'payment', label: 'Problème de paiement', recipient: 'Admin', note: 'Le souci de paiement sera transmis à l’équipe administrative.' },
+  { key: 'reservation', label: 'Réservation', recipient: 'Agence + Admin', note: 'L’agence concernée et l’administration seront informées.' },
+  { key: 'delay', label: 'Bus retardé', recipient: 'Agence', note: 'La ligne agence sera alertée pour l’intervention rapide.' },
+  { key: 'ticket-edit', label: 'Modification d’un billet', recipient: 'Agence', note: 'Le support agence prendra en charge la modification.' },
+  { key: 'tech', label: 'Problème technique du site', recipient: 'Admin', note: 'L’équipe technique et l’administration seront prévenues.' },
+  { key: 'account', label: 'Compte client', recipient: 'Admin', note: 'Le besoin lié au compte sera traité par l’administration.' },
+  { key: 'refund', label: 'Remboursement', recipient: 'Admin', note: 'La demande de remboursement sera orientée vers l’administration.' },
+  { key: 'general-question', label: 'Question générale', recipient: 'Chatbot', note: 'Le chatbot répondra directement à la question générale.' },
+];
+
 function chatbotFindReply(message) {
   const text = message.toLowerCase();
   for (const entry of CHATBOT_KB) {
@@ -203,6 +215,12 @@ function chatbotInit() {
         } else if (q.startQuiz) {
           addMessage(q.label, 'user');
           startQuiz();
+        } else if (q.startSupport) {
+          addMessage(q.label, 'user');
+          startEmergencySupport();
+        } else if (q.supportOption) {
+          addMessage(q.label, 'user');
+          handleEmergencySupportChoice(q.supportOption);
         } else if (q.ask) {
           handleUserMessage(q.ask);
         } else {
@@ -215,6 +233,26 @@ function chatbotInit() {
     });
     messagesEl.appendChild(wrap);
     messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function startEmergencySupport() {
+    addMessage('🆘 Support d’urgence', 'bot');
+    addMessage('Choisissez le type de problème pour obtenir l’orientation correcte.', 'bot');
+    addQuickReplies(EMERGENCY_SUPPORT_OPTIONS.map(opt => ({ label: opt.label, supportOption: opt.key })));
+  }
+
+  function handleEmergencySupportChoice(optionKey) {
+    const option = EMERGENCY_SUPPORT_OPTIONS.find(item => item.key === optionKey);
+    if (!option) return;
+
+    const supportText = `🛟 Catégorie : ${option.label}\n📌 Destinataire : ${option.recipient}\n🧭 Orientation : ${option.note}`;
+
+    addMessage(supportText, 'bot');
+    addWhatsappHandoff(`Support d'urgence - ${option.label} - Destinataire: ${option.recipient} - Page: ${document.title}`);
+    addQuickReplies([
+      { label: '🔁 Nouveau support', startSupport: true },
+      { label: 'Question générale', ask: 'question générale' },
+    ]);
   }
 
   function addWhatsappHandoff(originalMessage) {
@@ -287,6 +325,14 @@ function chatbotInit() {
       return;
     }
 
+    const needsUrgentSupport = ['urgence', 'urgent', 'support', 'aide', 'problème', 'incident', 'panne', 'difficulté'].some(k => lower.includes(k));
+    if (needsUrgentSupport) {
+      setTimeout(() => {
+        startEmergencySupport();
+      }, 300);
+      return;
+    }
+
     setTimeout(() => {
       const match = chatbotFindReply(text);
       if (match) {
@@ -315,7 +361,8 @@ function chatbotInit() {
         { label: 'Réserver un trajet', url: 'recherche.html' },
         ...(role === 'agency' ? [{ label: 'Vérifier un ticket', url: 'verify-ticket.html?role=agency' }] : []),
         ...(role === 'admin' ? [{ label: 'Vérifier un ticket', url: 'verify-ticket.html?role=admin' }] : []),
-        { label: '🎮 Jouer au Quiz', startQuiz: true },
+        { label: '� Support d’urgence', startSupport: true },
+        { label: '�🎮 Jouer au Quiz', startQuiz: true },
       ]);
     }
   });

@@ -66,11 +66,36 @@ const ICONS = {
           <div class="notif-text"><strong>${ev.title || ''}</strong>${ev.body ? ' — ' + ev.body : ''}</div>
           <div class="notif-time">${new Date(ev.createdAt || ev.date || Date.now()).toLocaleString('fr-FR')}</div>
         </div>
-        ${ev.url ? `<a href="${ev.url}" class="btn-secondary" style="width:auto;padding:6px 12px;font-size:12px;">Voir</a>` : ''}
+        <div style="display:flex; gap:8px; align-items:center;">
+          ${ev.id ? `<button type="button" class="btn-secondary notif-read-btn" data-id="${ev.id}" style="width:auto;padding:6px 12px;font-size:12px;">Lire</button>` : ''}
+          ${ev.url ? `<a href="${ev.url}" class="btn-secondary notif-link" data-id="${ev.id || ''}" style="width:auto;padding:6px 12px;font-size:12px;">Voir</a>` : ''}
+        </div>
       </div>`;
       }).join('');
 
-  if (typeof camtravelNotify !== 'undefined') camtravelNotify.markAllRead({ role: 'client' });
+  list.querySelectorAll('.notif-read-btn').forEach(btn => {
+    btn.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const item = btn.closest('.notif-item');
+      if (typeof camtravelNotify !== 'undefined' && btn.dataset.id) {
+        camtravelNotify.markRead(btn.dataset.id);
+      }
+      if (item) {
+        item.classList.remove('notif-unread');
+        btn.textContent = 'Lu';
+        btn.disabled = true;
+      }
+    });
+  });
+
+  list.querySelectorAll('.notif-link').forEach(link => {
+    link.addEventListener('click', () => {
+      if (typeof camtravelNotify !== 'undefined' && link.dataset.id) {
+        camtravelNotify.markRead(link.dataset.id);
+      }
+    });
+  });
 
   const user = typeof camtravelGetCurrentUser === 'function' ? await camtravelGetCurrentUser() : null;
   if (user && typeof camtravelMarkClientAllSeen === 'function') camtravelMarkClientAllSeen(user.id);
