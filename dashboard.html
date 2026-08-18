@@ -109,6 +109,14 @@
       </form>
     </div>
 
+    <div class="panel anim-fade-up" style="margin:0 0 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+      <div>
+        <h3 style="margin:0 0 4px;">Réinitialisation des statistiques</h3>
+        <p style="margin:0; color:var(--gray-text); font-size:13px;">Efface les données locales du tableau de bord pour repartir à zéro.</p>
+      </div>
+      <button type="button" id="resetDashboardStatsBtn" class="btn-secondary" style="width:auto; padding:10px 16px;">Réinitialiser</button>
+    </div>
+
     <!-- STAT CARDS -->
     <div class="stat-cards">
       <div class="stat-card">
@@ -149,6 +157,29 @@
           <p class="label">Dépensé</p>
           <p class="value" id="statSpent">0 FCFA</p>
         </div>
+      </div>
+    </div>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <span class="insight-label">Performance</span>
+        <strong class="insight-value" id="clientPerformance">0%</strong>
+        <span class="insight-meta">Réservations à venir</span>
+      </div>
+      <div class="insight-card">
+        <span class="insight-label">Moyen / réservation</span>
+        <strong class="insight-value" id="clientAverage">0 FCFA</strong>
+        <span class="insight-meta">Dépense moyenne</span>
+      </div>
+      <div class="insight-card">
+        <span class="insight-label">Trajets actifs</span>
+        <strong class="insight-value" id="clientActiveTrips">0</strong>
+        <span class="insight-meta">En cours / à venir</span>
+      </div>
+      <div class="insight-card">
+        <span class="insight-label">Suivi</span>
+        <strong class="insight-value" id="clientFollowRate">0%</strong>
+        <span class="insight-meta">Trajets suivis</span>
       </div>
     </div>
 

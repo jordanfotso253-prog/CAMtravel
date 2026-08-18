@@ -25,7 +25,7 @@ const ICONS = {
         body: `${r.from} → ${r.to} · Réf. ${r.ref}`,
         type: 'booking',
         role: 'client',
-        url: 'mes-reservations.html',
+        url: 'notifications.html',
         push: false
       });
       if (r.refundStatus) {

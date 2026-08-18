@@ -65,6 +65,110 @@ let map, busMarker, routeLine, startMarker, endMarker;
 let tripsCache = [];
 let selectedIdx = 0;
 let tickTimer = null;
+let liveGpsWatchId = null;
+let liveGpsMarker = null;
+let usingRealGps = false;
+
+function updateGpsModeBadge(isReal) {
+  const badge = document.getElementById('gpsModeBadge');
+  if (!badge) return;
+  badge.innerHTML = isReal
+    ? '<span class="gps-live-dot"></span> GPS réel actif'
+    : '<span class="gps-live-dot"></span> Mode estimé';
+}
+
+function setLiveGpsStatus(message) {
+  const detail = document.getElementById('gpsDetail');
+  if (!detail) return;
+  detail.dataset.liveMessage = message;
+  if (detail.dataset.liveMessage && !detail.innerHTML.includes('GPS réel')) {
+    detail.innerHTML += `<div style="margin-top:10px;font-size:12px;color:var(--green-deep);font-weight:700;">${message}</div>`;
+  }
+}
+
+function tryEnableRealGps() {
+  if (!('geolocation' in navigator)) {
+    updateGpsModeBadge(false);
+    const detail = document.getElementById('gpsDetail');
+    if (detail) {
+      detail.innerHTML = `
+        <div style="font-weight:700;margin-bottom:8px;">GPS réel</div>
+        <div style="font-size:13px;line-height:1.6;color:var(--ink);">
+          <div>Ce navigateur ne prend pas en charge la géolocalisation.</div>
+          <div style="margin-top:8px;font-size:12px;color:var(--gray-text);">Le système continue avec le suivi estimé basé sur les horaires.</div>
+        </div>
+      `;
+    }
+    return;
+  }
+
+  usingRealGps = true;
+  updateGpsModeBadge(true);
+
+  const onSuccess = (position) => {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+    if (!ensureMap()) return;
+
+    if (liveGpsMarker) {
+      map.removeLayer(liveGpsMarker);
+    }
+
+    liveGpsMarker = L.circleMarker([lat, lng], {
+      radius: 10,
+      color: '#ef4444',
+      fillColor: '#ef4444',
+      fillOpacity: 1
+    }).addTo(map)
+      .bindPopup('Position GPS réelle actuelle');
+
+    map.setView([lat, lng], 12, { animate: true });
+
+    const detail = document.getElementById('gpsDetail');
+    if (detail) {
+      detail.innerHTML = `
+        <div style="font-weight:700;margin-bottom:8px;">GPS réel</div>
+        <div style="font-size:13px;line-height:1.6;color:var(--ink);">
+          <div><strong>Lat.</strong> ${lat.toFixed(5)}</div>
+          <div><strong>Lng.</strong> ${lng.toFixed(5)}</div>
+          <div><strong>Précision</strong> ${position.coords.accuracy} m</div>
+          <div style="margin-top:8px;font-size:12px;color:var(--gray-text);">Votre position est actuellement transmise par le navigateur.</div>
+        </div>
+      `;
+    }
+  };
+
+  const onError = () => {
+    usingRealGps = false;
+    updateGpsModeBadge(false);
+    const detail = document.getElementById('gpsDetail');
+    if (detail) {
+      detail.innerHTML = `
+        <div style="font-weight:700;margin-bottom:8px;">GPS réel</div>
+        <div style="font-size:13px;line-height:1.6;color:var(--ink);">
+          <div>Autorisation GPS refusée ou indisponible.</div>
+          <div style="margin-top:8px;font-size:12px;color:var(--gray-text);">Le suivi reste estimé à partir des horaires du trajet.</div>
+        </div>
+      `;
+    }
+  };
+
+  navigator.geolocation.getCurrentPosition(onSuccess, onError, {
+    enableHighAccuracy: true,
+    timeout: 20000,
+    maximumAge: 5000
+  });
+
+  if (liveGpsWatchId !== null && navigator.geolocation.clearWatch) {
+    navigator.geolocation.clearWatch(liveGpsWatchId);
+  }
+
+  liveGpsWatchId = navigator.geolocation.watchPosition(onSuccess, onError, {
+    enableHighAccuracy: true,
+    timeout: 15000,
+    maximumAge: 5000
+  });
+}
 
 function ensureMap() {
   if (map || typeof L === 'undefined') return !!map;
@@ -265,12 +369,25 @@ function demoTripsIfEmpty(reservations) {
   }
 
   document.getElementById('gpsRefreshBtn').addEventListener('click', () => {
-    refreshPositions();
+    if (usingRealGps) {
+      tryEnableRealGps();
+    } else {
+      refreshPositions();
+    }
     const btn = document.getElementById('gpsRefreshBtn');
     btn.textContent = 'Position actualisée ✓';
     setTimeout(() => { btn.textContent = 'Actualiser la position'; }, 1200);
   });
 
+  document.getElementById('gpsRealBtn').addEventListener('click', () => {
+    tryEnableRealGps();
+  });
+
   // mise à jour auto toutes les 20 s
-  tickTimer = setInterval(refreshPositions, 20000);
+  tickTimer = setInterval(() => {
+    refreshPositions();
+    if (usingRealGps && 'geolocation' in navigator) {
+      tryEnableRealGps();
+    }
+  }, 20000);
 })();

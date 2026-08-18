@@ -24,6 +24,7 @@
     const normalized = (role || '').toLowerCase();
     if (normalized === 'admin') return 'admin-dashboard.html';
     if (normalized === 'agency') return 'agency-dashboard.html';
+    if (normalized === 'client') return 'notifications.html';
     return 'dashboard.html';
   }
 

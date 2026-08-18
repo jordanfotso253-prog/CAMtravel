@@ -42,9 +42,9 @@
     <div class="dash-role-strip">
       <div>
         <h2 style="margin:0 0 4px;">Suivi GPS en direct</h2>
-        <p style="margin:0; color:var(--gray-text); font-size:13.5px;">Position estimée de votre bus sur la carte (simulation réaliste selon horaires).</p>
+        <p style="margin:0; color:var(--gray-text); font-size:13.5px;">Suivi temps réel si votre appareil partage sa position. Sinon, le système bascule sur une estimation basée sur les horaires.</p>
       </div>
-      <span class="role-badge client"><span class="gps-live-dot"></span> Espace client</span>
+      <span id="gpsModeBadge" class="role-badge client"><span class="gps-live-dot"></span> Mode estimé</span>
     </div>
 
     <div class="gps-layout anim-fade-up">
@@ -68,6 +68,7 @@
           <div style="font-size:13px; color:var(--gray-text);">Sélectionnez un trajet pour afficher le détail GPS.</div>
         </div>
         <button type="button" class="btn-primary" id="gpsRefreshBtn">Actualiser la position</button>
+        <button type="button" class="btn-hero-outline" id="gpsRealBtn" style="margin-top:10px; width:100%;">Activer le GPS réel</button>
       </div>
     </div>
   </main>

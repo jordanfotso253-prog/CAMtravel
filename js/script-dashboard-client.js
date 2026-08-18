@@ -20,15 +20,26 @@
   const totalSpent = real.reduce((sum, r) => sum + Number(r.total || 0), 0);
   const upcoming = real.filter(r => isUpcoming(r.date));
   const past = real.filter(r => !isUpcoming(r.date));
+  const avgSpent = totalReservations ? Math.round(totalSpent / totalReservations) : 0;
+  const performance = totalReservations ? Math.min(100, Math.round((upcoming.length / totalReservations) * 100)) : 0;
+  const followRate = totalReservations ? Math.min(100, Math.round(((upcoming.length + past.length) / totalReservations) * 100)) : 0;
 
   const elReservations = document.getElementById('statMyReservations');
   const elSpent = document.getElementById('statSpent');
   const elUpcoming = document.getElementById('statUpcoming');
   const elPast = document.getElementById('statPast');
+  const elPerformance = document.getElementById('clientPerformance');
+  const elAverage = document.getElementById('clientAverage');
+  const elActiveTrips = document.getElementById('clientActiveTrips');
+  const elFollowRate = document.getElementById('clientFollowRate');
   if (elReservations) elReservations.textContent = totalReservations;
   if (elSpent) elSpent.textContent = `${totalSpent.toLocaleString('fr-FR')} FCFA`;
   if (elUpcoming) elUpcoming.textContent = upcoming.length;
   if (elPast) elPast.textContent = past.length;
+  if (elPerformance) elPerformance.textContent = `${performance}%`;
+  if (elAverage) elAverage.textContent = `${avgSpent.toLocaleString('fr-FR')} FCFA`;
+  if (elActiveTrips) elActiveTrips.textContent = upcoming.length;
+  if (elFollowRate) elFollowRate.textContent = `${followRate}%`;
 
   // Graphique mensuel client
   const chartC = document.getElementById('monthlyChartClient');
@@ -62,6 +73,28 @@
     }
   }
 
+  const resetBtn = document.getElementById('resetDashboardStatsBtn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', async () => {
+      const confirmed = window.confirm('Voulez-vous vraiment réinitialiser les statistiques locales de votre tableau de bord ?');
+      if (!confirmed) return;
+
+      resetBtn.disabled = true;
+      resetBtn.textContent = 'Réinitialisation...';
+
+      const ok = typeof camtravelResetLocalStats === 'function' ? camtravelResetLocalStats('client') : false;
+      if (ok) {
+        if (typeof window !== 'undefined') {
+          window.location.reload();
+        }
+      } else {
+        resetBtn.disabled = false;
+        resetBtn.textContent = 'Réinitialiser';
+        alert('La réinitialisation a échoué.');
+      }
+    });
+  }
+
   // ---- Notifications client (basées sur les réservations réelles du
   // compte connecté ; marquées comme lues à l'ouverture, par compte) ----
   const notifBtn = document.getElementById('clientNotifBtn');
@@ -77,7 +110,8 @@
 
   const events = real.map(r => ({
     date: r.createdAt,
-    text: `Réservation confirmée : ${r.from} → ${r.to} (${r.ref})`
+    text: `Réservation confirmée : ${r.from} → ${r.to} (${r.ref})`,
+    url: 'mes-reservations.html'
   })).sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const unseenCount = events.filter(ev => ev.date > lastSeen).length;

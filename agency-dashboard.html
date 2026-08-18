@@ -81,6 +81,14 @@
       </form>
     </div>
 
+    <div class="panel anim-fade-up" style="margin:0 0 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+      <div>
+        <h3 style="margin:0 0 4px;">Réinitialisation des statistiques</h3>
+        <p style="margin:0; color:var(--gray-text); font-size:13px;">Efface les données locales de l'agence pour repartir à zéro.</p>
+      </div>
+      <button type="button" id="resetAgencyStatsBtn" class="btn-secondary" style="width:auto; padding:10px 16px;">Réinitialiser</button>
+    </div>
+
     
     <div class="panel" style="margin-bottom:16px;padding:12px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;">
       <div style="display:flex;align-items:center;gap:8px;">
@@ -109,6 +117,29 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/></svg>
         </div>
         <div><p class="label">Chiffre d'affaires</p><p class="value" id="statRevenue">0 FCFA</p></div>
+      </div>
+    </div>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <span class="insight-label">Taux d'occupation</span>
+        <strong class="insight-value" id="agencyOccupancy">0%</strong>
+        <span class="insight-meta">Sur les sièges vendus</span>
+      </div>
+      <div class="insight-card">
+        <span class="insight-label">Moyen / trajet</span>
+        <strong class="insight-value" id="agencyAverage">0 FCFA</strong>
+        <span class="insight-meta">Prix moyen</span>
+      </div>
+      <div class="insight-card">
+        <span class="insight-label">Trajets actifs</span>
+        <strong class="insight-value" id="agencyActiveTrips">0</strong>
+        <span class="insight-meta">En ligne actuellement</span>
+      </div>
+      <div class="insight-card">
+        <span class="insight-label">Performance</span>
+        <strong class="insight-value" id="agencyPerformance">0%</strong>
+        <span class="insight-meta">Avec vos réservations</span>
       </div>
     </div>
 

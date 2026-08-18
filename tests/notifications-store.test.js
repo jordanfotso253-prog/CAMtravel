@@ -64,7 +64,7 @@ function createHarness() {
   assert.strictEqual(adminEntry.url, 'admin-dashboard.html', 'admin notifications should open the admin dashboard by default');
 
   const clientEntry = await notify.add({ title: 'Alerte client', role: 'client', body: 'Test' });
-  assert.strictEqual(clientEntry.url, 'dashboard.html', 'client notifications should open the client dashboard by default');
+  assert.strictEqual(clientEntry.url, 'notifications.html', 'client notifications should stay in the notifications center by default');
 
   notify.markRead(clientEntry.id);
   const updated = notify.list({ role: 'client' }).find(item => item.id === clientEntry.id);

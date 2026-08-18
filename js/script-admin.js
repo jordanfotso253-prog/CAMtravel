@@ -43,6 +43,26 @@ function renderDailyChart(container, series) {
   }
 }
 
+const resetAdminStatsBtn = document.getElementById('resetAdminStatsBtn');
+if (resetAdminStatsBtn) {
+  resetAdminStatsBtn.addEventListener('click', () => {
+    const confirmed = window.confirm('Voulez-vous vraiment réinitialiser toutes les statistiques locales de la plateforme ?');
+    if (!confirmed) return;
+
+    resetAdminStatsBtn.disabled = true;
+    resetAdminStatsBtn.textContent = 'Réinitialisation...';
+
+    const ok = typeof camtravelResetLocalStats === 'function' ? camtravelResetLocalStats('admin') : false;
+    if (ok) {
+      window.location.reload();
+    } else {
+      resetAdminStatsBtn.disabled = false;
+      resetAdminStatsBtn.textContent = 'Réinitialiser';
+      alert('La réinitialisation a échoué.');
+    }
+  });
+}
+
 async function initAdminDashboard() {
   const [realUsers, realReservations, realColis, realPassengers, agencies] = await Promise.all([
     typeof camtravelGetUsers === 'function' ? camtravelGetUsers() : [],
@@ -53,14 +73,26 @@ async function initAdminDashboard() {
   ]);
 
   const revenue = realReservations.reduce((s, r) => s + Number(r.total || 0), 0);
+  const avgOrder = realReservations.length ? Math.round(revenue / realReservations.length) : 0;
+  const refundRate = realReservations.length ? Math.round((realReservations.filter(r => r.refundStatus === 'requested').length / realReservations.length) * 100) : 0;
+  const activeTrips = (typeof camtravelGetTrips === 'function' ? await camtravelGetTrips() : []).filter(t => t.active !== false).length;
+  const performance = realReservations.length ? Math.min(100, Math.round((realReservations.filter(r => (r.total || 0) > 0).length / realReservations.length) * 100)) : 0;
   const elUsers = document.getElementById('statUsers');
   const elRes = document.getElementById('statReservations');
   const elRev = document.getElementById('statRevenue');
   const elAg = document.getElementById('statAgencies');
+  const elAvg = document.getElementById('adminAvgOrder');
+  const elRefund = document.getElementById('adminRefundRate');
+  const elActive = document.getElementById('adminActiveTrips');
+  const elPerf = document.getElementById('adminPerformance');
   if (elUsers) elUsers.textContent = realUsers.length.toLocaleString('fr-FR');
   if (elRes) elRes.textContent = realReservations.length.toLocaleString('fr-FR');
   if (elRev) elRev.textContent = revenue.toLocaleString('fr-FR') + ' FCFA';
   if (elAg) elAg.textContent = (agencies.length || 0).toLocaleString('fr-FR');
+  if (elAvg) elAvg.textContent = `${avgOrder.toLocaleString('fr-FR')} FCFA`;
+  if (elRefund) elRefund.textContent = `${refundRate}%`;
+  if (elActive) elActive.textContent = activeTrips.toLocaleString('fr-FR');
+  if (elPerf) elPerf.textContent = `${performance}%`;
 
   // Cartes stats cliquables
   document.querySelectorAll('.stat-card [data-link], .stat-card .value[data-link]').forEach(el => {

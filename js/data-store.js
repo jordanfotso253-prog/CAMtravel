@@ -22,6 +22,8 @@ const CAMTRAVEL_AGENCY_ACCOUNTS_KEY = 'camtravel_agency_accounts';
 
 function camtravelSeedLocalCatalog() {
   try {
+    const resetLocked = localStorage.getItem('camtravel_stats_reset_lock') === '1';
+    if (resetLocked) return;
     const ver = localStorage.getItem('camtravel_catalog_ver');
     if (ver === '4') return; // catalogue sans agence CAM travel
     // Invalide l'ancien catalogue (qui pouvait contenir CAM travel comme agence)
@@ -512,6 +514,56 @@ function camtravelGetClientLastSeen(userId) {
 
 function camtravelMarkClientAllSeen(userId) {
   localStorage.setItem('camtravel_client_last_seen_' + userId, new Date().toISOString());
+}
+
+function camtravelResetLocalStats(scope = 'all') {
+  try {
+    const targets = {
+      all: [
+        CAMTRAVEL_USERS_KEY,
+        CAMTRAVEL_RESERVATIONS_KEY,
+        CAMTRAVEL_COLIS_KEY,
+        'camtravel_passengers',
+        CAMTRAVEL_TRIPS_KEY,
+        CAMTRAVEL_AGENCIES_KEY,
+        CAMTRAVEL_AGENCY_ACCOUNTS_KEY
+      ],
+      client: [
+        CAMTRAVEL_USERS_KEY,
+        CAMTRAVEL_RESERVATIONS_KEY,
+        CAMTRAVEL_COLIS_KEY,
+        'camtravel_passengers'
+      ],
+      agency: [
+        CAMTRAVEL_TRIPS_KEY,
+        CAMTRAVEL_AGENCY_ACCOUNTS_KEY,
+        CAMTRAVEL_AGENCIES_KEY
+      ],
+      admin: [
+        CAMTRAVEL_USERS_KEY,
+        CAMTRAVEL_RESERVATIONS_KEY,
+        CAMTRAVEL_COLIS_KEY,
+        'camtravel_passengers',
+        CAMTRAVEL_AGENCIES_KEY,
+        CAMTRAVEL_AGENCY_ACCOUNTS_KEY
+      ]
+    };
+
+    const keys = targets[scope] || targets.all;
+    keys.forEach(key => localStorage.removeItem(key));
+    localStorage.setItem('camtravel_stats_reset_lock', '1');
+    return true;
+  } catch (e) {
+    console.warn('Réinitialisation des statistiques impossible.', e);
+    return false;
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.camtravelResetLocalStats = camtravelResetLocalStats;
+}
+if (typeof globalThis !== 'undefined') {
+  globalThis.camtravelResetLocalStats = camtravelResetLocalStats;
 }
 
 // ---------- TRAJETS (recherche publique, remplace l'ancien tableau en dur) ----------

@@ -93,6 +93,14 @@
       </form>
     </div>
 
+    <div class="panel anim-fade-up" style="margin:0 0 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+      <div>
+        <h3 style="margin:0 0 4px;">Réinitialisation des statistiques</h3>
+        <p style="margin:0; color:var(--gray-text); font-size:13px;">Efface les données locales de la plateforme pour repartir à zéro.</p>
+      </div>
+      <button type="button" id="resetAdminStatsBtn" class="btn-secondary" style="width:auto; padding:10px 16px;">Réinitialiser</button>
+    </div>
+
     <!-- STAT CARDS -->
     <div class="stat-cards">
       <div class="stat-card admin-stat-card">
@@ -130,6 +138,29 @@
           <p class="label">Revenus</p>
           <p class="value" id="statRevenue" data-link="commissions.html">0 FCFA</p>
         </div>
+      </div>
+    </div>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <span class="insight-label">CA moyen</span>
+        <strong class="insight-value" id="adminAvgOrder">0 FCFA</strong>
+        <span class="insight-meta">Par réservation</span>
+      </div>
+      <div class="insight-card">
+        <span class="insight-label">Taux de remboursement</span>
+        <strong class="insight-value" id="adminRefundRate">0%</strong>
+        <span class="insight-meta">Demandes actives</span>
+      </div>
+      <div class="insight-card">
+        <span class="insight-label">Trajets actifs</span>
+        <strong class="insight-value" id="adminActiveTrips">0</strong>
+        <span class="insight-meta">Tous réseaux</span>
+      </div>
+      <div class="insight-card">
+        <span class="insight-label">Performance</span>
+        <strong class="insight-value" id="adminPerformance">0%</strong>
+        <span class="insight-meta">Utilisation globale</span>
       </div>
     </div>
 

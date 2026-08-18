@@ -80,9 +80,19 @@ function openEditTrip(trip) {
 
 async function renderBookings() {
   const bookings = typeof camtravelGetAgencyReservations === 'function' ? await camtravelGetAgencyReservations(currentAgency.id) : [];
-  document.getElementById('statBookings').textContent = bookings.length;
+  const trips = typeof camtravelGetAgencyTrips === 'function' ? await camtravelGetAgencyTrips(currentAgency.id) : [];
   const revenue = bookings.reduce((s, b) => s + Number(b.total || 0), 0);
+  const avg = bookings.length ? Math.round(revenue / bookings.length) : 0;
+  const activeTrips = trips.filter(t => t.active !== false).length;
+  const occupancy = trips.length ? Math.min(100, Math.round((bookings.length / trips.reduce((sum, t) => sum + (Number(t.seatCount) || 0), 0)) * 100)) : 0;
+  const performance = bookings.length ? Math.min(100, Math.round((bookings.filter(b => Number(b.total || 0) > 0).length / bookings.length) * 100)) : 0;
+
+  document.getElementById('statBookings').textContent = bookings.length;
   document.getElementById('statRevenue').textContent = `${revenue.toLocaleString('fr-FR')} FCFA`;
+  document.getElementById('agencyOccupancy').textContent = `${occupancy}%`;
+  document.getElementById('agencyAverage').textContent = `${avg.toLocaleString('fr-FR')} FCFA`;
+  document.getElementById('agencyActiveTrips').textContent = activeTrips;
+  document.getElementById('agencyPerformance').textContent = `${performance}%`;
 
   const listEl = document.getElementById('bookingsList');
   listEl.innerHTML = bookings.length === 0
@@ -97,6 +107,26 @@ async function renderBookings() {
         <div class="trip-price">${Number(b.total || 0).toLocaleString('fr-FR')} FCFA</div>
       </div>
     `).join('');
+}
+
+const resetAgencyStatsBtn = document.getElementById('resetAgencyStatsBtn');
+if (resetAgencyStatsBtn) {
+  resetAgencyStatsBtn.addEventListener('click', () => {
+    const confirmed = window.confirm('Voulez-vous vraiment réinitialiser les statistiques locales de votre agence ?');
+    if (!confirmed) return;
+
+    resetAgencyStatsBtn.disabled = true;
+    resetAgencyStatsBtn.textContent = 'Réinitialisation...';
+
+    const ok = typeof camtravelResetLocalStats === 'function' ? camtravelResetLocalStats('agency') : false;
+    if (ok) {
+      window.location.reload();
+    } else {
+      resetAgencyStatsBtn.disabled = false;
+      resetAgencyStatsBtn.textContent = 'Réinitialiser';
+      alert('La réinitialisation a échoué.');
+    }
+  });
 }
 
 document.getElementById('tripForm').addEventListener('submit', async (e) => {

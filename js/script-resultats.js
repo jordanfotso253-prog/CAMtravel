@@ -15,6 +15,43 @@ document.getElementById('routeTitle').textContent = `${from} → ${to} | ${forma
 const list = document.getElementById('tripList');
 const countLabel = document.getElementById('countLabel');
 
+function renderDocumentary(doc) {
+  if (!doc || !list) return;
+
+  const existing = document.querySelector('.doc-feature');
+  if (existing) existing.remove();
+
+  const feature = document.createElement('section');
+  feature.className = 'doc-feature';
+  feature.innerHTML = `
+    <div class="doc-feature-media">
+      <img src="${doc.image}" alt="${doc.title}" loading="lazy">
+    </div>
+    <div class="doc-feature-content">
+      <span class="doc-feature-badge">Découverte culturelle</span>
+      <h3>${doc.title}</h3>
+      <p class="doc-feature-region">${doc.region} • ${doc.city}</p>
+      <p>${doc.description}</p>
+      <ul>
+        ${(doc.highlights || []).map(item => `<li>${item}</li>`).join('')}
+      </ul>
+    </div>
+  `;
+
+  list.appendChild(feature);
+}
+
+function getDocumentaryMatch() {
+  const params = new URLSearchParams(window.location.search);
+  const queryText = [params.get('q'), from, to].filter(Boolean).join(' ');
+
+  if (typeof window.landmarkDoc?.findLandmarkDocumentary === 'function') {
+    return window.landmarkDoc.findLandmarkDocumentary(queryText);
+  }
+
+  return null;
+}
+
 function renderTrips(trips) {
   countLabel.textContent = `${trips.length} trajet${trips.length > 1 ? 's' : ''} trouvé${trips.length > 1 ? 's' : ''}`;
 
@@ -75,4 +112,5 @@ function renderTrips(trips) {
     company: tr.company || 'Agence partenaire'
   }));
   renderTrips(trips);
+  renderDocumentary(getDocumentaryMatch());
 })();
