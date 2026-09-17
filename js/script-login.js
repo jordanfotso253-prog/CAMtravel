@@ -9,6 +9,14 @@ document.querySelectorAll('.toggle-eye').forEach(btn => {
 const form = document.getElementById('loginForm');
 const banner = document.getElementById('statusBanner');
 
+const loginRole = new URLSearchParams(window.location.search).get('role');
+const loginTitle = document.getElementById('loginTitle');
+if (loginTitle && loginRole === 'agence') {
+  loginTitle.textContent = 'Connexion à votre espace agence';
+} else if (loginTitle && loginRole === 'admin') {
+  loginTitle.textContent = 'Connexion administrateur';
+}
+
 function setError(fieldId, hasError) {
   const el = document.getElementById(fieldId);
   if (el) el.classList.toggle('error', hasError);
@@ -61,9 +69,12 @@ form.addEventListener('submit', async (e) => {
           ? await camtravelGetCurrentUser()
           : null;
         const email = (currentUser && currentUser.email) ? currentUser.email : identifiant;
+        
+        // 1) Vérifier si c'est un administrateur
         if (typeof camtravelIsAdminEmail === 'function' && await camtravelIsAdminEmail(email)) {
           destination = 'admin-dashboard.html';
         } else {
+          // 2) Vérifier si c'est une agence
           const agency = typeof camtravelGetMyAgency === 'function' ? await camtravelGetMyAgency() : null;
           if (agency && agency.id) {
             try {
@@ -76,6 +87,7 @@ form.addEventListener('submit', async (e) => {
             } catch (e) {}
             destination = 'agency-dashboard.html';
           }
+          // 3) Sinon, c'est un client
         }
       } catch (e) { /* en cas de doute → dashboard client */ }
 
